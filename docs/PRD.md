@@ -128,16 +128,27 @@ Une seule application. L'utilisateur choisit son rôle à l'inscription.
 
 *Exemple pour une garde de 210 € réalisée par un Pet Sitter Master : l'Owner paie 220,50 €, le Pet Sitter reçoit 207,90 € et la plateforme encaisse 12,60 €.*
 
-### 3.7 Paiement
-- **Stripe Connect** pour le paiement des gardes (service réel entre deux personnes, donc **hors achats intégrés Apple**).
-- Paiement intégral à la confirmation, puis versement au Pet Sitter selon les règles Stripe. La plateforme ne présente pas ce mécanisme comme un « séquestre » (escrow).
-- KYC des Pet Sitters réalisé par Stripe au premier versement. Il sert aussi de base à l'« identité vérifiée » du New Sitter Boost.
-- **Annulation** : ⚠️ À valider, appliquée en V1 sous forme de proposition :
-  - plus de 7 jours avant la mission : 100 % remboursé ;
-  - de 3 à 7 jours : 75 % ;
-  - de 24 à 72 h : 50 % ;
-  - moins de 24 h : 0 %.
-- Pour chaque annulation, l'application enregistre l'auteur, le motif et l'horodatage. Le Pet Sitter peut signaler une annulation faite à la demande de l'Owner, qui peut la confirmer ou la contester. Les désaccords sont revus manuellement.
+### 3.7 Paiement, codes de remise et portefeuille du Pet Sitter
+
+Règles validées par le fondateur le 25/11/2026 :
+
+1. Dès que l'Owner et le Pet Sitter sont d'accord sur le prix, **l'Owner paie la totalité du séjour** : prix du service et frais de 5 %. Le paiement passe par **Stripe Connect** (service réel, donc **hors achats intégrés Apple**). En phase 2, ce paiement est remplacé par le bouton « Confirmer la mission ».
+2. L'app génère un **code de remise à 6 chiffres**, visible seulement par l'Owner, avec l'avertissement : *« Ce code ne doit être donné qu'au moment de la remise de votre animal au Pet Sitter. »*
+3. **Le Pet Sitter saisit ce code à la remise de l'animal.** La mission démarre et sa part (prix moins sa commission) est créditée dans son **portefeuille, en statut « Retenu »** jusqu'à la fin de la mission.
+4. À tout moment, le Pet Sitter dispose dans le chat de l'onglet **« Générer le code de remise »** (fin de mission ou fin anticipée). **L'Owner saisit ce code dans le chat** pour valider la fin de la mission.
+5. **Fin anticipée** : avant le dernier jour, le Pet Sitter indique qui met fin à la garde. L'Owner voit ce motif avant de saisir le code.
+   - **Le Pet Sitter se désiste** : l'Owner ne paie que les jours effectués (au prorata) ; le reste lui est remboursé ; aucun Paw Point.
+   - **L'Owner reprend son animal plus tôt** : aucun remboursement.
+6. À la fin de la mission, la part du Pet Sitter passe en statut **« Disponible »**. Il peut alors la **transférer vers son compte bancaire** depuis l'app (versement Stripe Connect).
+
+Sécurité : les codes ne figurent jamais dans les messages ni dans les notifications. Chaque code est limité à 5 essais.
+
+⚠️ À valider :
+- remboursement des frais Owner de 5 % au prorata en cas de désistement du Pet Sitter ;
+- frais kilométriques du Dog Walking dans le montant payé ;
+- politique d'annulation **avant** la remise (plus de 7 jours : 100 %, de 3 à 7 jours : 75 %, de 24 à 72 h : 50 %, moins de 24 h : 0 %) ;
+- KYC des Pet Sitters par Stripe avant le premier versement ;
+- conditions de rétention des fonds par Stripe (la plateforme ne présente pas ce mécanisme comme un « séquestre »).
 
 ### 3.8 Owner Club — le seul paywall de la V1
 - Abonnement annuel **49,99 €/an**, vendu via **Superwall + StoreKit** (achat intégré Apple).
