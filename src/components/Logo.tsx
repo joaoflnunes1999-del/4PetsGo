@@ -2,9 +2,9 @@ import { Image } from 'expo-image';
 import { StyleSheet, View } from 'react-native';
 
 import { Text } from '@/components/ui';
-import { colors, fontFamily } from '@/theme';
+import { colors, fontFamily, palette } from '@/theme';
 
-/** Brand lockup in the app palette: terracotta house + paw mark, "4Pets" in clay brown, "Go" in terracotta. */
+/** Official logo lockup: terracotta house + paw, "4Pets" in charcoal, "Go" in sage (as in the logo file). */
 export function Logo({ size = 120, wordmark = true }: { size?: number; wordmark?: boolean }) {
   return (
     <View style={styles.wrap} accessibilityRole="image" accessibilityLabel="4PetsGo">
@@ -22,6 +22,6 @@ export function Logo({ size = 120, wordmark = true }: { size?: number; wordmark?
 const styles = StyleSheet.create({
   wrap: { alignItems: 'center' },
   word: { fontFamily: fontFamily.displayBold, letterSpacing: -0.5 },
-  forest: { color: colors.secondary },
-  leaf: { color: colors.brand },
+  forest: { color: colors.text },
+  leaf: { color: palette.sage[500] },
 });
