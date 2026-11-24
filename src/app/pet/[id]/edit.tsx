@@ -44,7 +44,8 @@ export default function EditPet() {
   const weightKg = weight ? Number(weight.replace(',', '.')) : undefined;
   const birthError = birth && !birthIso ? 'Format JJ/MM/AAAA, date passée' : undefined;
   const weightError = weight && (!Number.isFinite(weightKg) || weightKg! <= 0 || weightKg! > 120) ? 'Poids invalide' : undefined;
-  const valid = draft.name.trim().length > 0 && !birthError && !weightError;
+  const weightMissing = draft.species === 'dog' && !weight.trim();
+  const valid = draft.name.trim().length > 0 && !birthError && !weightError && !weightMissing;
 
   const save = () => {
     updatePet(pet.id, {
@@ -78,7 +79,7 @@ export default function EditPet() {
             testID="edit-bio"
           />
           <Input label="Date de naissance" value={birth} onChangeText={setBirth} placeholder="JJ/MM/AAAA" error={birthError} />
-          <Input label="Poids" value={weight} onChangeText={setWeight} keyboardType="decimal-pad" suffix="kg" error={weightError} />
+          <Input label={draft.species === 'dog' ? 'Poids (obligatoire)' : 'Poids'} value={weight} onChangeText={setWeight} keyboardType="decimal-pad" suffix="kg" error={weightError || (weightMissing ? 'Le poids du chien est obligatoire' : undefined)} />
           <Text variant="title">Sexe</Text>
           <View style={styles.chips}>
             <Chip label="Mâle" selected={draft.sex === 'male'} onPress={() => set({ sex: 'male' })} />

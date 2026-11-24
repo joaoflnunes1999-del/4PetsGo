@@ -36,7 +36,9 @@ export default function NewPet() {
     weight: weight && (!Number.isFinite(weightKg) || weightKg! <= 0 || weightKg! > 120) ? 'Poids invalide' : undefined,
     estimate: estimate && (!Number.isFinite(estimateYears) || estimateYears! < 0 || estimateYears! > 30) ? 'Âge invalide' : undefined,
   };
-  const valid = name.trim().length >= 1 && !!breedId && !errors.birth && !errors.weight && !errors.estimate;
+  // A dog's weight is mandatory: it sets the size category, hence the minimum price.
+  const weightMissing = species === 'dog' && !weight.trim();
+  const valid = name.trim().length >= 1 && !!breedId && !weightMissing && !errors.birth && !errors.weight && !errors.estimate;
 
   const create = () => {
     const id = addPet({
@@ -170,7 +172,7 @@ export default function NewPet() {
         <Chip label="Femelle" selected={sex === 'female'} onPress={() => setSex('female')} />
       </View>
       <Input
-        label="Poids"
+        label={species === 'dog' ? 'Poids (obligatoire)' : 'Poids'}
         value={weight}
         onChangeText={setWeight}
         keyboardType="decimal-pad"
@@ -178,7 +180,9 @@ export default function NewPet() {
         error={errors.weight}
         helper={
           species === 'dog'
-            ? `Sert à calculer le tarif minimum. Catégorie : ${SIZE_LABELS[sizeCategoryFor('dog', errors.weight ? undefined : weightKg, getBreed(breedId!).typicalSize)]}${weightKg && !errors.weight ? '' : ' (selon la race)'}`
+            ? weightKg && !errors.weight
+              ? `Catégorie : ${SIZE_LABELS[sizeCategoryFor('dog', weightKg)]}. Sert à calculer le tarif minimum.`
+              : 'Indispensable pour calculer le tarif minimum de garde.'
             : undefined
         }
         testID="pet-weight"

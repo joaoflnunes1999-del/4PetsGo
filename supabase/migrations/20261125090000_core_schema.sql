@@ -105,7 +105,9 @@ create table public.pets (
   main_photo_id uuid,
   personality jsonb not null default '{"traits":[]}',
   routine jsonb not null default '{}',
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  -- A dog's weight is mandatory: it sets the size category, hence the minimum price.
+  constraint pets_dog_weight_required check (species <> 'dog' or weight_kg is not null)
 );
 create index pets_owner_id_idx on public.pets (owner_id);
 

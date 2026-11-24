@@ -54,9 +54,9 @@ try {
     await shot('breed-selected');
     await id('breed-continue').click();
     await id('pet-name').fill('Pistache');
-    await page.getByText(/Catégorie : Grand chien \(25–40 kg\) \(selon la race\)/).waitFor(); // golden = large by breed
+    if (!(await id('pet-create').isDisabled())) throw new Error('a dog cannot be created without its weight');
     await id('pet-weight').fill('28');
-    await page.getByText(/Catégorie : Grand chien \(25–40 kg\)$/).waitFor();
+    await page.getByText(/Catégorie : Grand chien \(25–40 kg\)/).waitFor();
     await id('pet-create').click();
     await page.getByText('Le profil de Pistache est prêt').waitFor();
     await shot('pet-profile-created');

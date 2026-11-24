@@ -171,14 +171,24 @@ begin
   raise notice 'expiry: offers expire after 48 h (scheduled job) and the request closes';
 end $$;
 commit;
--- Floor without weight: breed typical size (Saint-bernard = dogXL → 17 € x 2 days).
-insert into public.pets (id, owner_id, name, species, breed_id) values
-  ('00000000-0000-0000-0000-00000000f002', '00000000-0000-0000-0000-0000000000a1', 'Bernie', 'dog', 'dog-saint-bernard');
+-- A dog's weight is mandatory.
+do $$ begin
+  begin
+    insert into public.pets (owner_id, name, species, breed_id) values
+      ('00000000-0000-0000-0000-0000000000a1', 'NoWeight', 'dog', 'dog-beagle');
+    raise exception 'expected check violation';
+  exception when check_violation then null;
+  end;
+  raise notice 'pets: a dog cannot be created without its weight';
+end $$;
+-- Floor per pet x days (Saint-bernard 62 kg = dogXL).
+insert into public.pets (id, owner_id, name, species, breed_id, weight_kg) values
+  ('00000000-0000-0000-0000-00000000f002', '00000000-0000-0000-0000-0000000000a1', 'Bernie', 'dog', 'dog-saint-bernard', 62);
 do $$ begin
   assert private.request_floor_cents('boarding', 'FR', array['00000000-0000-0000-0000-00000000f002']::uuid[], 2) = 1700 * 2,
-    'floor uses breed typical size when weight is unknown';
+    'floor for an XL dog';
   assert private.request_floor_cents('boarding', 'CH', array['00000000-0000-0000-0000-00000000f001','00000000-0000-0000-0000-00000000f002']::uuid[], 3)
     = (3080 + 4030) * 3, 'floor sums every pet (weight or breed) x days, CH grid';
-  raise notice 'floor: per pet (weight, else breed size) x days; an owner can never propose less';
+  raise notice 'floor: per pet size (from weight) x days; an owner can never propose less';
 end $$;
 drop table public._t;
