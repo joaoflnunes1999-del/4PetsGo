@@ -28,6 +28,7 @@ export default function RequestDetail() {
   const mySitter = useAppStore((s) => s.mySitter);
   const { respondToOffer, cancel, refreshExpiry } = useAppStore.getState();
   const [confirmCancel, setConfirmCancel] = useState(false);
+  const hasChat = useAppStore((s) => !!s.chats[id]);
 
   useEffect(() => {
     refreshExpiry();
@@ -109,6 +110,18 @@ export default function RequestDetail() {
               {lockedSitter.firstName} gagnera {missionPawPoints({ ownerClub: owner.ownerClub, firstMission: lockedSitter.completedMissions === 0 })} Paw Points à la fin de la mission.
             </Text>
           </View>
+          {hasChat ? (
+            <Button label="Ouvrir le chat de la mission" icon="message-circle" onPress={() => router.push({ pathname: '/mission/[id]', params: { id: request.id } })} testID="open-chat" />
+          ) : viewer === 'owner' ? (
+            <Button
+              label="Confirmer la mission"
+              icon="check-circle"
+              onPress={() => {
+                if (useAppStore.getState().confirmMission(request.id).ok) router.push({ pathname: '/mission/[id]', params: { id: request.id } });
+              }}
+              testID="confirm-mission"
+            />
+          ) : null}
         </Card>
       ) : null}
 
