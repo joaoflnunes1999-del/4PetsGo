@@ -44,6 +44,8 @@ type Actions = {
   completeOwnerOnboarding: (input: { firstName: string; cityId: string }) => void;
   completeSitterOnboarding: (profile: SitterProfile) => void;
   updateMySitter: (patch: Partial<SitterProfile>) => void;
+  /** Phase 1 demo only (dev builds): Owner Club purchase arrives with Superwall in phase 3. */
+  setOwnerClubDemo: (value: boolean) => void;
   addPet: (pet: Omit<PetProfile, 'id' | 'ownerId' | 'createdAt'>) => string;
   updatePet: (id: string, patch: Partial<PetProfile>) => void;
   deletePet: (id: string) => void;
@@ -88,6 +90,8 @@ export const useAppStore = create<State & Actions>()(
       completeSitterOnboarding: (profile) => set({ role: 'sitter', mySitter: profile }),
 
       updateMySitter: (patch) => set((s) => (s.mySitter ? { mySitter: { ...s.mySitter, ...patch } } : s)),
+
+      setOwnerClubDemo: (value) => set((s) => (s.owner ? { owner: { ...s.owner, ownerClub: value } } : s)),
 
       addPet: (pet) => {
         const id = newId('pet');

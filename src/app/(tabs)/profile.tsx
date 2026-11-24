@@ -1,17 +1,18 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, Switch, View } from 'react-native';
 
 import { CityPicker } from '@/components/CityPicker';
 import { LevelIcon } from '@/components/levels/LevelIcon';
 import { LevelsInfoSheet } from '@/components/levels/LevelsInfoSheet';
+import { OwnerAvatar } from '@/components/owners/OwnerAvatar';
 import { LevelBadge } from '@/components/sitters/LevelBadge';
 import { SitterAvatar } from '@/components/sitters/SitterAvatar';
 import { Button, Card, ConfirmSheet, Icon, InfoRow, Screen, Sheet, Text } from '@/components/ui';
 import { LEVELS, levelProgress } from '@/features/levels/levels';
 import { getCity } from '@/features/sitters/cities';
 import { useAppStore } from '@/store/useAppStore';
-import { colors, radius, spacing } from '@/theme';
+import { colors, spacing } from '@/theme';
 
 export default function ProfileTab() {
   const role = useAppStore((s) => s.role);
@@ -37,15 +38,18 @@ export default function ProfileTab() {
           {role === 'sitter' && mySitter ? (
             <SitterAvatar sitter={mySitter} size={56} />
           ) : (
-            <View style={styles.avatar}>
-              <Icon name="user" size={26} color="primary" />
-            </View>
+            owner ? <OwnerAvatar owner={owner} size={64} /> : null
           )}
           <View style={styles.flex}>
             <Text variant="displayS">{name}</Text>
             <Text variant="callout" color="textMuted">
               {role === 'sitter' ? 'Pet Sitter' : `Propriétaire · ${pets.length} animal${pets.length > 1 ? 'aux' : ''}`}
             </Text>
+            {role === 'owner' && owner?.ownerClub ? (
+              <Text variant="caption" color="accentStrong">
+                Membre Owner Club
+              </Text>
+            ) : null}
           </View>
         </View>
         <InfoRow icon="map-pin" label="Ville" value={city ? `${city.name} (${city.country === 'FR' ? 'France' : 'Suisse'})` : undefined} />
@@ -104,6 +108,24 @@ export default function ProfileTab() {
         </>
       ) : null}
 
+      {__DEV__ && role === 'owner' && owner ? (
+        <Card tone="muted" style={styles.demo}>
+          <View style={styles.flex}>
+            <Text variant="label" color="info">
+              MODE DÉMO
+            </Text>
+            <Text variant="callout">Simuler l’abonnement Owner Club</Text>
+          </View>
+          <Switch
+            value={owner.ownerClub}
+            onValueChange={(v) => useAppStore.getState().setOwnerClubDemo(v)}
+            trackColor={{ true: colors.action, false: colors.border }}
+            accessibilityLabel="Simuler l’abonnement Owner Club"
+            testID="demo-owner-club"
+          />
+        </Card>
+      ) : null}
+
       <Card tone="muted" style={styles.gap}>
         <Text variant="bodyStrong">Données de cet appareil</Text>
         <Text variant="caption" color="textMuted">
@@ -142,19 +164,12 @@ const styles = StyleSheet.create({
   gap: { gap: spacing.md },
   row: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
   flex: { flex: 1 },
-  avatar: {
-    width: 56,
-    height: 56,
-    borderRadius: radius.pill,
-    backgroundColor: colors.primarySoft,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   track: { height: 8, borderRadius: 4, backgroundColor: colors.surfaceMuted, overflow: 'hidden' },
   fill: { height: 8, borderRadius: 4, backgroundColor: colors.accent },
   levels: { flexDirection: 'row', justifyContent: 'space-between' },
   levelItem: { alignItems: 'center', gap: spacing.xxs },
   /** Levels not yet reached are dimmed; the current one stays fully visible. */
   levelOther: { opacity: 0.45 },
+  demo: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
   infoButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing.xs, paddingVertical: spacing.sm },
 });
