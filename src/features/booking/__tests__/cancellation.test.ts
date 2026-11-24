@@ -21,7 +21,7 @@ describe('cancellation policy', () => {
     expect(cancellationSettlement({ priceCents: 8000, ownerFeeCents: 400, hoursBeforeStart: 2, cancelledBy: 'sitter', commissionRate: 0.05 }).rate).toBe(1);
     const waived = cancellationSettlement({ priceCents: 8000, ownerFeeCents: 400, hoursBeforeStart: 2, cancelledBy: 'owner', commissionRate: 0.05, feeWaived: true });
     expect(waived.serviceRefundCents).toBe(8000);
-    expect(waived.ownerFeeRefundCents).toBe(400);
+    expect(waived.ownerFeeRefundCents).toBe(0); // 4PetsGo keeps its 5 % fee
     expect(waived.sitterEarnedCents).toBe(0);
   });
 });

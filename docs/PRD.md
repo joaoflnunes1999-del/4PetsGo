@@ -152,13 +152,13 @@ Règles validées par le fondateur le 25/11/2026 :
 
    - La part retenue revient au Pet Sitter, moins sa commission.
    - **Si le Pet Sitter annule, l'Owner est remboursé à 100 %**, frais compris.
-   - **Geste de compassion** : en cas d'urgence comprise par le Pet Sitter, celui-ci peut **renoncer aux frais d'annulation**, et l'Owner est alors remboursé à 100 %. Seul le Pet Sitter peut le faire, tant que la somme n'a pas été transférée.
+   - **Frais de service de 5 %** : ils ne sont **jamais remboursés quand l'Owner annule**, et sont remboursés en totalité quand le Pet Sitter annule ou se désiste.
+   - **Geste de compassion** : en cas d'urgence comprise par le Pet Sitter, celui-ci peut **renoncer aux frais d'annulation**. L'Owner récupère alors 100 % du prix du service, mais **4PetsGo conserve ses frais de 5 %**, qui restent facturés. Seul le Pet Sitter peut le faire, tant que la somme n'a pas été transférée.
 
 Sécurité : les codes ne figurent jamais dans les messages ni dans les notifications. Chaque code est limité à 5 essais.
 
 ⚠️ À valider :
 - frais kilométriques du Dog Walking dans le montant payé ;
-- frais Owner de 5 % lors d'une annulation par l'Owner : remboursés selon le même taux (hypothèse en place) ;
 - KYC des Pet Sitters par Stripe avant le premier versement ;
 - conditions de rétention des fonds par Stripe (la plateforme ne présente pas ce mécanisme comme un « séquestre »).
 

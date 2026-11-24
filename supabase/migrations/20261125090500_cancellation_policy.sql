@@ -3,9 +3,9 @@
 --      > 14 days → 100 % · 3–14 days → 75 % · 24–72 h → 50 % · < 24 h → 0 %.
 --    The retained part (cancellation fee) goes to the sitter, minus their commission.
 --  * Sitter cancels: owner refunded 100 %.
---  * The sitter may WAIVE the cancellation fee (compassion, e.g. an emergency) → owner refunded 100 %.
---  * Sitter withdraws during the mission: the owner's 5 % fee is refunded in full.
--- ⚠️ À valider: the owner's 5 % fee follows the same refund rate when the owner cancels.
+--  * The sitter may WAIVE the cancellation fee (compassion, e.g. an emergency) → service price refunded 100 %,
+--    but 4PetsGo keeps its 5 % fee: it is still charged to the owner.
+--  * Owner cancels: the 5 % fee is never refunded. Sitter cancels or withdraws: the 5 % fee is refunded in full.
 
 alter table public.missions
   add column owner_fee_refund_cents integer,
@@ -64,7 +64,8 @@ begin
     v_retained := v_m.price_cents - round(v_m.price_cents * v_rate);
     update public.missions set
       refund_cents = v_m.price_cents - v_retained,
-      owner_fee_refund_cents = round(v_m.owner_fee_cents * v_rate),
+      -- The platform keeps its 5 % fee when the OWNER cancels; refunded in full when the SITTER cancels.
+      owner_fee_refund_cents = case when v_by = 'sitter' then v_m.owner_fee_cents else 0 end,
       cancellation_fee_cents = v_retained,
       sitter_earned_cents = v_retained - round(v_retained * v_m.sitter_commission_rate)
     where id = p_mission_id;
@@ -101,7 +102,8 @@ begin
   end if;
   update public.wallet_entries set status = 'cancelled', amount_cents = 0 where mission_id = p_mission_id;
   update public.missions set
-    cancellation_fee_waived = true, refund_cents = price_cents, owner_fee_refund_cents = owner_fee_cents,
+    -- Compassion covers the sitter's part only: 4PetsGo's 5 % fee stays charged to the owner.
+    cancellation_fee_waived = true, refund_cents = price_cents,
     cancellation_fee_cents = 0, sitter_earned_cents = 0
   where id = p_mission_id;
   perform private.log_event(p_mission_id, 'cancellation_fee_waived');

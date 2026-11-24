@@ -161,6 +161,7 @@ begin
   perform public.cancel_mission(v_m, 'Changement de programme');
   reset role;
   assert (select refund_cents from public.missions where id = v_m) = 6000 and (select cancellation_fee_cents from public.missions where id = v_m) = 0;
+  assert (select owner_fee_refund_cents from public.missions where id = v_m) = 0, 'owner cancels: 5 % fee kept';
 
   -- Owner cancels 7 days ahead → 75 % refunded, 25 % retained for the sitter (minus commission).
   v_m := pg_temp.new_confirmed_mission('00000000-0000-0000-0000-0000000000c1', current_date + 7, 8000);
@@ -180,8 +181,9 @@ begin
   perform public.waive_cancellation_fee(v_m);
   reset role;
   assert (select refund_cents from public.missions where id = v_m) = 8000 and (select cancellation_fee_waived from public.missions where id = v_m);
+  assert (select owner_fee_refund_cents from public.missions where id = v_m) = 0, '4PetsGo keeps its 5 % fee even with compassion';
   assert (select status from public.wallet_entries where mission_id = v_m) = 'cancelled';
-  raise notice 'compassion: only the sitter can waive the cancellation fee; owner refunded 100 %%';
+  raise notice 'compassion: only the sitter can waive; service price refunded 100 %%, 4PetsGo 5 %% fee still charged';
 
   -- Owner cancels on the start day (< 24 h) → nothing refunded.
   v_m := pg_temp.new_confirmed_mission('00000000-0000-0000-0000-0000000000c1', current_date, 5000);
