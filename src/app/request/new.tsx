@@ -46,7 +46,7 @@ export default function NewRequest() {
       : Number.isNaN(proposalCents) || proposalCents <= 0
         ? 'Montant invalide'
         : proposalCents < floor
-          ? `Le minimum 4PetsGo pour cette demande est ${formatMoney(floor, currency)}`
+          ? `Prix minimum : ${formatMoney(floor, currency)}`
           : undefined;
 
   const send = () => {
@@ -129,9 +129,8 @@ export default function NewRequest() {
 
       <Card tone="muted" style={styles.gap}>
         <Text variant="bodyStrong">Proposer votre prix (facultatif)</Text>
-        <Text variant="caption" color="textMuted">
-          Par défaut, chaque Pet Sitter reçoit son tarif affiché. Vous pouvez proposer un autre montant, jamais inférieur à {formatMoney(floor, currency)}.
-          Chacun dispose ensuite de 3 propositions maximum, et chaque offre expire après 48 h.
+        <Text variant="callout" testID="request-floor">
+          Prix minimum : {formatMoney(floor, currency)}
         </Text>
         <Input
           value={proposal}

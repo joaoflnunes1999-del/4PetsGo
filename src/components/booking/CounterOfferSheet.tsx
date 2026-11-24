@@ -23,7 +23,7 @@ export function CounterOfferSheet({ visible, onClose, currency, floorCents, curr
     value && Number.isNaN(cents)
       ? 'Montant invalide'
       : value && cents < floorCents
-        ? `Minimum ${formatMoney(floorCents, currency)}`
+        ? `Prix minimum : ${formatMoney(floorCents, currency)}`
         : undefined;
 
   return (
@@ -41,7 +41,7 @@ export function CounterOfferSheet({ visible, onClose, currency, floorCents, curr
         placeholder={formatMoney(currentCents, currency)}
         suffix={currency === 'EUR' ? '€' : 'CHF'}
         error={localError ?? serverError}
-        helper={`Prix minimum 4PetsGo : ${formatMoney(floorCents, currency)}. L’offre expire après 48 h.`}
+        helper={`Prix minimum : ${formatMoney(floorCents, currency)}`}
         autoFocus
         testID="counter-input"
       />
