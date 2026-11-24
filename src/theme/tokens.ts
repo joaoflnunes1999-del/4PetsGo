@@ -4,50 +4,54 @@
  */
 
 export const palette = {
-  // Brand
-  pine900: '#12342A',
-  pine700: '#1F4D3F', // primary
-  pine500: '#3E7A66',
-  pine100: '#E3EEE9',
-  apricot600: '#D9823B',
-  apricot500: '#EE9A52', // accent
-  apricot100: '#FCEBDC',
+  // Brand — aloe vera green
+  aloe800: '#24603F',
+  aloe700: '#367F5C', // primary actions (white text ≥ 4.8:1)
+  aloe500: '#5FA57F', // brand aloe vera
+  aloe300: '#A8D5B9',
+  aloe100: '#E7F3EC',
+  aloe50: '#F3F9F5',
+  // Warm highlight, used sparingly (Paw Points, ratings, "new" tags)
+  honey600: '#B7791F',
+  honey500: '#E9A23B',
+  honey100: '#FDF2DF',
 
-  // Neutrals (warm)
-  ink: '#1A1D1B',
-  slate: '#5E6661',
-  stone: '#9AA19C',
-  sand: '#E9E3D8',
-  linen: '#F4EFE7',
-  cream: '#FBF8F3',
+  // Neutrals (clean, near-white marketplace look)
+  ink: '#171A18',
+  slate: '#646A66',
+  stone: '#9BA19D',
+  line: '#E6E8E6',
+  mist: '#F4F5F4',
   white: '#FFFFFF',
 
   // Feedback
   success: '#2F8A5B',
-  successSoft: '#E1F2E8',
+  successSoft: '#E3F3EA',
   warning: '#B7791F',
   warningSoft: '#FBF0DA',
   danger: '#C2413A',
-  dangerSoft: '#F8E3E1',
+  dangerSoft: '#F9E5E3',
   info: '#2F6E9E',
-  infoSoft: '#E1ECF5',
+  infoSoft: '#E3EDF6',
 } as const;
 
 export const colors = {
-  background: palette.cream,
+  background: palette.white,
   surface: palette.white,
-  surfaceMuted: palette.linen,
-  border: palette.sand,
+  surfaceMuted: palette.mist,
+  border: palette.line,
   text: palette.ink,
   textMuted: palette.slate,
   textSubtle: palette.stone,
   textInverse: palette.white,
-  primary: palette.pine700,
-  primaryPressed: palette.pine900,
-  primarySoft: palette.pine100,
-  accent: palette.apricot500,
-  accentStrong: palette.apricot600,
-  accentSoft: palette.apricot100,
+  primary: palette.aloe700,
+  primaryPressed: palette.aloe800,
+  primarySoft: palette.aloe100,
+  brand: palette.aloe500,
+  brandTint: palette.aloe50,
+  accent: palette.honey500,
+  accentStrong: palette.honey600,
+  accentSoft: palette.honey100,
   success: palette.success,
   successSoft: palette.successSoft,
   warning: palette.warning,
@@ -56,7 +60,7 @@ export const colors = {
   dangerSoft: palette.dangerSoft,
   info: palette.info,
   infoSoft: palette.infoSoft,
-  overlay: 'rgba(18, 22, 20, 0.92)',
+  overlay: 'rgba(17, 20, 18, 0.94)',
   photoBackdrop: palette.white,
 } as const;
 
@@ -72,28 +76,30 @@ export const spacing = {
   xxxl: 48,
 } as const;
 
+/** Marketplace-style: tight corners on controls and cards, round only for avatars/chips. */
 export const radius = {
-  sm: 8,
-  md: 12,
-  lg: 16,
-  xl: 24,
+  xs: 4,
+  sm: 6,
+  md: 8,
+  lg: 12,
+  xl: 20,
   pill: 999,
 } as const;
 
 export const fontFamily = {
-  display: 'Fraunces_600SemiBold',
-  displayBold: 'Fraunces_700Bold',
+  display: 'Inter_700Bold',
+  displayBold: 'Inter_800ExtraBold',
   body: 'Inter_400Regular',
   bodyMedium: 'Inter_500Medium',
   bodySemiBold: 'Inter_600SemiBold',
   bodyBold: 'Inter_700Bold',
 } as const;
 
-/** Type scale. `display*` variants use the serif (emotional: pet names, titles); the rest use Inter. */
+/** Type scale — a single sans-serif family (Inter), hierarchy carried by weight and size. */
 export const typography = {
-  displayL: { fontFamily: fontFamily.display, fontSize: 32, lineHeight: 38, letterSpacing: -0.4 },
-  displayM: { fontFamily: fontFamily.display, fontSize: 26, lineHeight: 32, letterSpacing: -0.3 },
-  displayS: { fontFamily: fontFamily.display, fontSize: 21, lineHeight: 27, letterSpacing: -0.2 },
+  displayL: { fontFamily: fontFamily.display, fontSize: 26, lineHeight: 32, letterSpacing: -0.4 },
+  displayM: { fontFamily: fontFamily.display, fontSize: 22, lineHeight: 28, letterSpacing: -0.3 },
+  displayS: { fontFamily: fontFamily.display, fontSize: 18, lineHeight: 24, letterSpacing: -0.2 },
   title: { fontFamily: fontFamily.bodySemiBold, fontSize: 17, lineHeight: 23 },
   body: { fontFamily: fontFamily.body, fontSize: 15, lineHeight: 22 },
   bodyStrong: { fontFamily: fontFamily.bodySemiBold, fontSize: 15, lineHeight: 22 },
@@ -105,19 +111,14 @@ export const typography = {
 
 export type TypographyVariant = keyof typeof typography;
 
+/** Flat UI: separation comes from hairline borders; only floating layers cast a shadow. */
 export const shadow = {
-  card: {
-    shadowColor: '#2B2118',
-    shadowOpacity: 0.06,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 2,
-  },
+  card: {},
   floating: {
-    shadowColor: '#2B2118',
-    shadowOpacity: 0.12,
-    shadowRadius: 20,
-    shadowOffset: { width: 0, height: 8 },
+    shadowColor: '#000000',
+    shadowOpacity: 0.1,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 6 },
     elevation: 6,
   },
 } as const;
@@ -127,5 +128,7 @@ export const layout = {
   maxContentWidth: 560,
   galleryColumns: 3,
   galleryGap: 2,
+  /** Two-column grid gap for card grids (pets). */
+  gridGap: 12,
   hitSlop: 8,
 } as const;
