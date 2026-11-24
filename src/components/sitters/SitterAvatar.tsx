@@ -5,12 +5,12 @@ import { Text } from '@/components/ui';
 import type { SitterProfile } from '@/domain/types';
 import { palette } from '@/theme';
 
-/** Initials avatars stay within the brand palette and never use the card colour (beige). */
+/** Initials avatars stay within the brand palette (terracotta dominant, other tones for variety). */
 const TONES = [
-  [palette.terracotta[200], palette.earth[500]],
-  [palette.sage[100], palette.sage[700]],
-  [palette.earth[500], palette.cream],
   [palette.terracotta[100], palette.terracotta[700]],
+  [palette.sand[300], palette.clay[500]],
+  [palette.blue[100], palette.blue[700]],
+  [palette.sage[100], palette.sage[700]],
 ] as const;
 
 export function SitterAvatar({ sitter, size }: { sitter: SitterProfile; size: number }) {

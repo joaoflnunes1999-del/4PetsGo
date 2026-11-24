@@ -14,7 +14,7 @@ type Props = {
 };
 
 export function Chip({ label, selected, onPress, icon, testID }: Props) {
-  const fg = 'text';
+  const fg = selected ? 'selectedText' : 'text';
   return (
     <Pressable
       testID={testID}

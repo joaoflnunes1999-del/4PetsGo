@@ -4,7 +4,7 @@ import { StyleSheet, View } from 'react-native';
 import { Text } from '@/components/ui';
 import { colors, fontFamily } from '@/theme';
 
-/** Brand lockup in the app palette: house + paw mark and "4Pets" in earth brown, "Go" in terracotta. */
+/** Brand lockup in the app palette: terracotta house + paw mark, "4Pets" in clay brown, "Go" in terracotta. */
 export function Logo({ size = 120, wordmark = true }: { size?: number; wordmark?: boolean }) {
   return (
     <View style={styles.wrap} accessibilityRole="image" accessibilityLabel="4PetsGo">
@@ -22,6 +22,6 @@ export function Logo({ size = 120, wordmark = true }: { size?: number; wordmark?
 const styles = StyleSheet.create({
   wrap: { alignItems: 'center' },
   word: { fontFamily: fontFamily.displayBold, letterSpacing: -0.5 },
-  forest: { color: colors.primary },
+  forest: { color: colors.secondary },
   leaf: { color: colors.brand },
 });

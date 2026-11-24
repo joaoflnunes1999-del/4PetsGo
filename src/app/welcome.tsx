@@ -28,7 +28,7 @@ export default function Welcome() {
         {PILLARS.map((p) => (
           <View key={p.title} style={styles.pillar}>
             <View style={styles.pillarIcon}>
-              <Icon name={p.icon} size={20} color="accentStrong" />
+              <Icon name={p.icon} size={20} color="selectedText" />
             </View>
             <View style={styles.pillarText}>
               <Text variant="bodyStrong">{p.title}</Text>
@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: radius.pill,
-    backgroundColor: colors.accentSoft,
+    backgroundColor: colors.selected,
     alignItems: 'center',
     justifyContent: 'center',
   },
