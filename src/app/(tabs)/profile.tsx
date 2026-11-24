@@ -1,14 +1,14 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { CityPicker } from '@/components/CityPicker';
 import { LevelIcon } from '@/components/levels/LevelIcon';
+import { LevelsInfoSheet } from '@/components/levels/LevelsInfoSheet';
 import { LevelBadge } from '@/components/sitters/LevelBadge';
 import { SitterAvatar } from '@/components/sitters/SitterAvatar';
 import { Button, Card, ConfirmSheet, Icon, InfoRow, Screen, Sheet, Text } from '@/components/ui';
 import { LEVELS, levelProgress } from '@/features/levels/levels';
-import { SITTER_COMMISSION_RATE } from '@/features/pricing/config';
 import { getCity } from '@/features/sitters/cities';
 import { useAppStore } from '@/store/useAppStore';
 import { colors, radius, spacing } from '@/theme';
@@ -21,6 +21,7 @@ export default function ProfileTab() {
   const resetAll = useAppStore((s) => s.resetAll);
   const [confirmReset, setConfirmReset] = useState(false);
   const [cityOpen, setCityOpen] = useState(false);
+  const [levelsInfo, setLevelsInfo] = useState(false);
 
   const name = role === 'sitter' ? mySitter?.firstName : owner?.firstName;
   const cityId = role === 'sitter' ? mySitter?.cityId : owner?.cityId;
@@ -60,7 +61,7 @@ export default function ProfileTab() {
               return (
                 <>
                   <Text variant="body">
-                    Niveau {level.rank} · {level.name} · commission de {Math.round(SITTER_COMMISSION_RATE[level.id] * 100)}{'\u00a0'}%
+                    Niveau {level.rank} · {level.name}
                   </Text>
                   {next ? (
                     <>
@@ -68,7 +69,7 @@ export default function ProfileTab() {
                         <View style={[styles.fill, { width: `${Math.max(4, progress * 100)}%` }]} />
                       </View>
                       <Text variant="caption" color="textMuted">
-                        Encore {remaining} Paw Points pour atteindre {next.name} ({Math.round(SITTER_COMMISSION_RATE[next.id] * 100)}{'\u00a0'}%).
+                        Encore {remaining} Paw Points pour atteindre {next.name}.
                       </Text>
                     </>
                   ) : null}
@@ -83,13 +84,22 @@ export default function ProfileTab() {
                   testID={`level-${l.id}`}>
                   <LevelIcon level={l.id} size={40} />
                   <Text variant="caption">{l.name}</Text>
-                  <Text variant="caption" color="textMuted">
-                    {Math.round(SITTER_COMMISSION_RATE[l.id] * 100)}{'\u00a0'}%
-                  </Text>
                 </View>
               ))}
             </View>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Avantages de chaque niveau"
+              onPress={() => setLevelsInfo(true)}
+              style={styles.infoButton}
+              testID="levels-info">
+              <Icon name="info" size={18} color="primary" />
+              <Text variant="callout" color="primary">
+                Avantages de chaque niveau
+              </Text>
+            </Pressable>
           </Card>
+          <LevelsInfoSheet visible={levelsInfo} onClose={() => setLevelsInfo(false)} current={levelProgress(mySitter.pawPoints).level.id} />
           <Button label="Voir mon profil public" variant="secondary" icon="eye" onPress={() => router.push({ pathname: '/sitter/[id]', params: { id: mySitter.id } })} />
         </>
       ) : null}
@@ -146,4 +156,5 @@ const styles = StyleSheet.create({
   levelItem: { alignItems: 'center', gap: spacing.xxs },
   /** Levels not yet reached are dimmed; the current one stays fully visible. */
   levelOther: { opacity: 0.45 },
+  infoButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing.xs, paddingVertical: spacing.sm },
 });
