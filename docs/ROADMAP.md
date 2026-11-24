@@ -6,7 +6,7 @@ Construite à partir de [`PRD.md`](./PRD.md). Chaque phase commence par un **pla
 
 ---
 
-## Phase 1 — L'action principale fonctionne en local (objectif : aujourd'hui)
+## Phase 1 — L'action principale fonctionne en local ✅ (terminée le 24/11/2026, testée sur Expo Web, test iOS/Argent en attente d'un Mac)
 
 **But** : dans le simulateur, un Owner crée le profil de son animal, trouve des Pet Sitters, envoie une demande, négocie, et la mission se verrouille. Tout fonctionne avec des **données locales** (stockage sur l'appareil et Pet Sitters de démonstration).
 

@@ -3,7 +3,7 @@
 Marketplace iOS reliant Owners (propriétaires d'animaux) et Pet Sitters, en France et en Suisse.
 Docs produit : [`docs/PRD.md`](docs/PRD.md) · [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
-**Phase actuelle : Phase 1**, avec des données locales uniquement (aucun backend).
+**Phase actuelle : Phase 1 terminée** (données locales, testée sur Expo Web). Validation dans le simulateur iOS (Argent) en attente d'un Mac. Prochaine étape : plan de la phase 2.
 
 ## Règles de travail
 
@@ -26,6 +26,8 @@ npm run typecheck         # tsc --noEmit
 npm run lint              # expo lint
 npm test                  # Jest (logique métier)
 npm run check             # typecheck + lint + tests — à lancer avant chaque commit
+# E2E Expo Web (sans Mac) : lancer le serveur web, puis
+node e2e/phase1-web.mjs <dossier-photos-jpg pet1..pet4> <dossier-captures>
 EXPO_OFFLINE=1 npx expo install <pkg>   # ajouter une dépendance compatible avec le SDK (offline si api.expo.dev est bloqué)
 ```
 
@@ -36,7 +38,7 @@ EXPO_OFFLINE=1 npx expo install <pkg>   # ajouter une dépendance compatible ave
 - Polices : Fraunces (titres, côté émotionnel) + Inter (texte), via `@expo-google-fonts`.
 - Icônes : `@expo/vector-icons` (Feather et MaterialCommunityIcons).
 - Images : `expo-image` pour l'affichage, `expo-image-picker` pour la caméra et la photothèque.
-- Tests : Jest (`jest-expo`) pour la logique pure, dans `src/features/**/__tests__`.
+- Tests : Jest (`jest-expo`) pour la logique pure, dans `src/features/**/__tests__`. Le parcours E2E Playwright sur Expo Web est dans `e2e/phase1-web.mjs` (onboarding → animal → galerie → recherche → négociation → verrouillage → Pet Sitter).
 - À venir : Supabase (Postgres, RLS, Auth Apple, Storage, Edge Functions), Stripe Connect, Superwall/StoreKit, PostHog, Sentry, Resend.
 
 ## Architecture
@@ -71,11 +73,15 @@ docs/                      # PRD, roadmap
 - **La logique métier est pure et testée** (pricing, négociation, classement). Les écrans ne font qu'appeler ces fonctions. En phase 2, le verrouillage et les règles de négociation seront ré-implémentés **côté serveur** (fonction Postgres transactionnelle et RLS), et les fonctions TypeScript serviront à l'affichage.
 - **Configuration tarifaire** dans `src/features/pricing/config.ts` : elle deviendra une table `pricing_config` en phase 2.
 - **Bibliothèque de races** dans `src/features/pets/breeds.ts`, avec un champ `image`. Elle deviendra une table `breeds` et un bucket Storage administrable en phase 2. Tant qu'aucune photo studio sous licence n'est disponible, une image générique chien ou chat sur fond blanc est utilisée.
+- **Sélecteurs de test** : chaque élément interactif clé porte un `testID` (devient `data-testid` sur le web). Argent et Playwright s'appuient dessus.
+- **Feuilles modales** : utiliser `Sheet`, `ActionSheet` ou `ConfirmSheet` (basées sur `Modal`), jamais `Alert.alert` avec des boutons (sans effet sur le web).
 - **Mode démo** (phase 1 uniquement) : sur l'écran d'une demande, un panneau « Répondre en tant que Pet Sitter » simule les réponses des Pet Sitters de démonstration. Il sera retiré en phase 2.
 - **Interprétations encore à valider** (voir PRD §9) :
   - les frais Owner et la commission s'appliquent aussi aux frais kilométriques du Dog Walking ;
   - le prix minimum des Home Visits est compté par jour ;
-  - la simulation Owner Club applique −10 % sur le prix du service, puis les frais Owner de 5 %.
+  - la simulation Owner Club applique −10 % sur le prix du service, puis les frais Owner de 5 % ;
+  - un seul tarif journalier par gabarit est saisi pour la garde et les visites ;
+  - les prix suisses validés résultent de deux arrondis successifs aux 10 centimes (voir le test dans `pricing.test.ts`).
 
 ## Environnement
 
