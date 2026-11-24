@@ -75,8 +75,8 @@ Une seule application. L'utilisateur choisit son rôle à l'inscription.
   - **Personnalité** : traits, énergie, comportement avec les animaux et les enfants, socialisation, peurs, commandes connues.
   - **Routine** : alimentation, activités, promenades, sommeil, jouets.
   - **Soins** : vétérinaire (nom, téléphone, adresse facultative), numéro de puce, médicaments (nom, dosage, mode d'administration, fréquence, horaires).
-- **Confidentialité des photos** : Public, Réservations confirmées uniquement, ou Privé. Modifiable à tout moment.
-- **Les données de soins ne sont jamais publiques.** Elles sont visibles uniquement par l'Owner et par le Pet Sitter d'une réservation confirmée et en cours. Cette règle est appliquée **côté serveur (RLS)**.
+- **Profil et galerie publics dans l'app** (décision du 25/11/2026, remplace les 3 niveaux de confidentialité) : comme sur Instagram, le profil de l'animal et ses photos sont visibles par tout membre connecté qui ouvre le profil. Seul l'Owner peut les modifier.
+- **Données sensibles** : les **photos échangées pendant une mission** (chat, rapports, First Night Update) et les **données de soins** (vétérinaire, médicaments, puce). **Elles ne sont jamais publiques.** Elles sont visibles uniquement par l'Owner et par le Pet Sitter d'une réservation confirmée et en cours. Cette règle est appliquée **côté serveur (RLS)**.
 
 ### 3.3 Profil Pet Sitter
 - Présentation, expérience, services proposés et zone d'intervention : rayon de 5, 10, 15, 20 ou 30 km.
@@ -97,7 +97,7 @@ Une seule application. L'utilisateur choisit son rôle à l'inscription.
 2. Chaque demande possède un **identifiant de mission unique**.
 3. Chaque Pet Sitter peut **accepter**, **refuser** ou faire une **contre-offre**.
 4. **Négociation** : jusqu'à **3 allers-retours** par Pet Sitter. Chaque offre **expire au bout de 48 h** sans réponse. L'historique des offres reste visible.
-5. Une offre ne peut **jamais descendre sous le prix minimum** du service (voir 3.6).
+5. Une offre ne peut **jamais descendre sous le prix minimum** du service (voir 3.6). Ce minimum vaut, pour chaque animal, le tarif de son gabarit (selon son poids, ou selon sa race si le poids n'est pas renseigné), multiplié par le nombre de jours. Cette règle s'applique à la proposition initiale de l'Owner comme à chaque contre-proposition, dans l'app et sur le serveur.
 6. **Verrouillage** : dès qu'un accord est conclu entre l'Owner et un Pet Sitter, la mission est verrouillée **de façon atomique côté serveur**. Toutes les autres offres sont automatiquement clôturées, et aucun autre Pet Sitter ne peut plus accepter.
 7. L'Owner voit le récapitulatif du prix → **carte Owner Club** (paywall, voir 3.8) → paiement → **mission confirmée**.
 

@@ -54,8 +54,9 @@ try {
     await shot('breed-selected');
     await id('breed-continue').click();
     await id('pet-name').fill('Pistache');
+    await page.getByText(/Catégorie : Grand chien \(25–40 kg\) \(selon la race\)/).waitFor(); // golden = large by breed
     await id('pet-weight').fill('28');
-    await page.getByText('Catégorie : Grand chien').waitFor();
+    await page.getByText(/Catégorie : Grand chien \(25–40 kg\)$/).waitFor();
     await id('pet-create').click();
     await page.getByText('Le profil de Pistache est prêt').waitFor();
     await shot('pet-profile-created');
@@ -92,14 +93,13 @@ try {
     await id('viewer-close').click();
     await id('gallery-photo-2').waitFor();
   });
-  await step('edit profile: bio + privacy', async () => {
+  await step('edit profile: bio; gallery is public inside the app (no privacy setting)', async () => {
     await page.getByRole('button', { name: 'Modifier le profil' }).click();
     await id('edit-bio').fill('Golden au grand cœur, fan de balles de tennis.');
-    await page.getByRole('tab', { name: 'Confidentialité' }).click();
-    await id('visibility-private').click();
+    if (await page.getByRole('tab', { name: 'Confidentialité' }).count()) throw new Error('privacy tab must be gone');
     await id('pet-save').click();
     await page.getByText('Golden au grand cœur').waitFor();
-    await page.getByText('Photos : Privé').waitFor();
+    await page.getByText(/Photos visibles par les membres de 4PetsGo/).waitFor();
     await page.getByRole('tab', { name: 'Soins' }).click();
     await page.getByText('Informations sensibles').waitFor();
     await shot('pet-care-tab');

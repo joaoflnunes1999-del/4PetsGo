@@ -3,7 +3,7 @@
 Marketplace iOS reliant Owners (propriétaires d'animaux) et Pet Sitters, en France et en Suisse.
 Docs produit : [`docs/PRD.md`](docs/PRD.md) · [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
-**Phase actuelle : Phase 1 terminée** (données locales, testée sur Expo Web). Validation dans le simulateur iOS (Argent) en attente d'un Mac. Prochaine étape : plan de la phase 2.
+**Phase actuelle : Phase 2 en cours.** Le schéma Supabase, la RLS et la négociation côté serveur sont faits et testés sur PostgreSQL local. Le branchement de l'app à Supabase attend le projet du fondateur.
 
 ## Règles de travail
 
@@ -26,6 +26,7 @@ npm run typecheck         # tsc --noEmit
 npm run lint              # expo lint
 npm test                  # Jest (logique métier)
 npm run check             # typecheck + lint + tests — à lancer avant chaque commit
+npm run db:test           # migrations + tests RLS/négociation + test de concurrence (PostgreSQL local, PGHOST/PGPORT)
 # E2E Expo Web (sans Mac) : lancer le serveur web, puis
 node e2e/phase1-web.mjs <dossier-photos-jpg pet1..pet4> <dossier-captures>
 EXPO_OFFLINE=1 npx expo install <pkg>   # ajouter une dépendance compatible avec le SDK (offline si api.expo.dev est bloqué)
@@ -93,6 +94,8 @@ docs/                      # PRD, roadmap
   - Photos de profil parfaitement circulaires, pour les utilisateurs comme pour les animaux. Les photos de la galerie restent carrées.
   - **Logo officiel** (fourni le 24/11/2026) : maison et patte en terracotta, « 4Pets » en charbon, « Go » en sauge, sur fond ivoire. Il sert d'icône d'app, de splash, de favicon et d'icône Android, avec le fond en Warm Ivory. Dans l'app, il passe par le composant `Logo` (`logo-mark.png`).
 - **Profil Pet Sitter** : en haut, prénom, âge, ville et distance, puis **4 tuiles compactes** (`KeyTiles`, environ 10 % de l'écran, icône et valeur courte, sans libellé) : logement (icône maison ou immeuble, avec la surface), extérieur, enfants, animaux au foyer. Pour un Pet Sitter sans garde : rayon, expérience, missions, nombre de chiens. Ensuite la présentation, puis les services. **Aucun tarif sur le profil ni sur les cartes de résultats** : le prix apparaît seulement dans la demande, où il est négocié.
+- **Prix minimum** : pour chaque animal, `MIN_DAILY_PRICE[pays][gabarit]`, où le gabarit vient du poids, sinon de la race (`breeds.typical_size`). Le minimum de la demande est la somme sur tous les animaux, multipliée par le nombre de jours. L'Owner ne peut jamais proposer moins, et aucune contre-proposition ne peut descendre sous ce montant. La règle est appliquée dans l'app (`floorFor`) **et** sur le serveur (`private.request_floor_cents`).
+- **Visibilité** (décision du 25/11/2026) : le profil de l'animal et sa galerie sont **publics pour les membres connectés** (comme Instagram). Il n'y a plus de réglage de confidentialité. **Données sensibles** : photos de mission (chat, rapports, First Night Update) et `pet_care`, visibles seulement par l'Owner et le Pet Sitter d'une mission confirmée, pendant la mission.
 - **Argent en centimes entiers** (`number` en centimes), arrondi au centime à chaque étape. Devise : EUR pour la France, CHF pour la Suisse, selon le pays de l'Owner.
 - **La logique métier est pure et testée** (pricing, négociation, classement). Les écrans ne font qu'appeler ces fonctions. En phase 2, le verrouillage et les règles de négociation seront ré-implémentés **côté serveur** (fonction Postgres transactionnelle et RLS), et les fonctions TypeScript serviront à l'affichage.
 - **Configuration tarifaire** dans `src/features/pricing/config.ts` : elle deviendra une table `pricing_config` en phase 2.
