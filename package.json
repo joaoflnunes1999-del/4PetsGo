@@ -40,6 +40,7 @@
     "@types/react": "~19.3.0",
     "eslint": "^9.39.5",
     "jest": "^30.5.2",
+    "supabase": "^2.122.1",
     "typescript": "~6.0.3"
   },
   "scripts": {
@@ -49,7 +50,8 @@
     "lint": "expo lint",
     "typecheck": "tsc --noEmit",
     "test": "jest",
-    "check": "npm run typecheck && npm run lint && npm test -- --ci"
+    "check": "npm run typecheck && npm run lint && npm test -- --ci",
+    "db:test": "scripts/db-test.sh && scripts/db-concurrency-test.sh"
   },
   "private": true,
   "jest": {
