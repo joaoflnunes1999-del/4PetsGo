@@ -4,91 +4,106 @@
  */
 
 /**
- * Brand palette (validated by the founder, 24/11/2026) — natural, earthy tones.
- * Every colour of the app and all its variants live here; screens only use `colors` (semantic tokens).
- * Reference values: terracotta #C8795B · earth brown #713F32 · cream #F8F3EC · rosy beige #EAD9CC ·
- * sage #A9B5A0 · charcoal #34312E.
+ * Brand palette (validated by the founder, 24/11/2026) — natural, elegant, terracotta-led.
+ * Every colour and all its variants live here; screens only use the semantic `colors` below.
+ * Base values: Burnt Terracotta #B9674E · Clay Brown #854B3A · Warm Ivory #F7F2EA · Soft Sand #E9D8C9 ·
+ * Dusty Blue #718B9C · Sage Green #A8B09A · Charcoal #35312E · Muted Gold #D5AD79.
+ *
+ * Contrast rules: white on terracotta 500 = 4.1:1 (bold button labels only). Coloured TEXT and small
+ * icons use the 700 shades (≥ 4.6:1 on ivory and white).
  */
 export const palette = {
   terracotta: {
-    50: '#FBF1EC',
-    100: '#F1E2D6',
-    200: '#E2C3B0',
-    500: '#C8795B', // couleur principale, boutons d'action
-    600: '#B0654A', // pressed
-    700: '#9E583D', // terracotta-family text on light backgrounds (4.9:1)
+    50: '#FBF3EF',
+    100: '#F4E1D8',
+    200: '#E8C3B3',
+    500: '#B9674E', // Burnt Terracotta — brand, action buttons, accents
+    600: '#A35A43', // pressed
+    700: '#9C553F', // terracotta text & icons (5.0:1 on ivory)
   },
-  earth: {
-    500: '#713F32', // contrastes, éléments importants (7.7:1 on cream)
-    700: '#5A3027',
+  clay: {
+    500: '#854B3A', // Clay Brown — contrast and depth (6.2:1 on ivory)
+    700: '#6E3D2F',
   },
-  cream: '#F8F3EC', // fonds principaux
-  beige: {
-    100: '#F1E7DE',
-    300: '#EAD9CC', // fonds secondaires et cartes
-    400: '#E0CDBF', // bordures
+  ivory: '#F7F2EA', // Warm Ivory — main background
+  sand: {
+    100: '#F2E8DE',
+    300: '#E9D8C9', // Soft Sand — secondary backgrounds, content zones
+    400: '#DDCBBB', // borders on sand
+  },
+  blue: {
+    100: '#E3EAEE',
+    500: '#718B9C', // Dusty Blue — filters, selection, secondary info (use sparingly)
+    700: '#4F6877', // blue text & icons (5.3:1 on ivory)
   },
   sage: {
-    100: '#DDE3D8', // éléments sélectionnés (fond)
-    300: '#A9B5A0', // couleur complémentaire
-    500: '#7E8C74', // bordure des éléments sélectionnés
-    700: '#56634E', // texte sauge (5.8:1)
+    100: '#E8EBE2',
+    500: '#A8B09A', // Sage Green — positive elements, natural details
+    700: '#596249', // sage text (5.8:1)
+  },
+  gold: {
+    100: '#F6EBDC',
+    500: '#D5AD79', // Muted Gold — rewards, Paw Points, small decorative details
+    700: '#80602F', // gold text (5.2:1)
   },
   charcoal: {
-    900: '#34312E', // textes et titres
-    600: '#58504A', // texte secondaire
-    400: '#958C84', // placeholders
+    900: '#35312E', // Charcoal — main text and titles
+    600: '#5F5852', // secondary text (≥ 5:1 on ivory, white and sand)
+    400: '#978E86', // placeholders, disabled
   },
   white: '#FFFFFF',
-  field: '#FFFDFA', // fond des champs de saisie
+  line: '#E6DCD1',
   /** Logo green from the supplied logo file (app icon only). */
   logoLeaf: '#209C40',
 
-  // Feedback
-  success: '#56634E',
-  successSoft: '#DDE3D8',
-  warning: '#9E583D',
-  warningSoft: '#F7E4D4',
+  // Feedback (danger is the only colour outside the brand palette)
   danger: '#A83A2F',
   dangerSoft: '#F6DEDA',
-  info: '#3F6478',
-  infoSoft: '#E1E9EE',
 } as const;
 
 export const colors = {
-  background: palette.cream,
-  surface: palette.beige[300],
-  surfaceMuted: palette.beige[100],
-  field: palette.field,
-  selected: palette.sage[100],
-  selectedBorder: palette.sage[500],
-  border: palette.beige[400],
+  background: palette.ivory,
+  /** Cards are white on the ivory background. */
+  surface: palette.white,
+  surfaceMuted: palette.sand[300],
+  field: palette.white,
+  border: palette.line,
   text: palette.charcoal[900],
   textMuted: palette.charcoal[600],
   textSubtle: palette.charcoal[400],
   textInverse: palette.white,
-  /** Action buttons (terracotta). */
+  /** Action buttons (Burnt Terracotta). */
   action: palette.terracotta[500],
   actionPressed: palette.terracotta[600],
-  /** Important elements, icons, links and text accents (earth brown). */
-  primary: palette.earth[500],
-  primaryPressed: palette.earth[700],
-  primarySoft: palette.terracotta[200],
+  /** Important elements, icons, links and text accents — terracotta family, text-safe shade. */
+  primary: palette.terracotta[700],
+  primaryPressed: palette.clay[700],
+  primarySoft: palette.terracotta[100],
+  /** Contrast and depth (Clay Brown). */
+  secondary: palette.clay[500],
   brand: palette.terracotta[500],
   brandText: palette.terracotta[700],
-  brandTint: palette.terracotta[100],
-  accent: palette.sage[300],
-  accentStrong: palette.sage[700],
-  accentSoft: palette.sage[100],
-  success: palette.success,
-  successSoft: palette.successSoft,
-  warning: palette.warning,
-  warningSoft: palette.warningSoft,
+  brandTint: palette.terracotta[50],
+  /** Filters and selected states (Dusty Blue, used sparingly). */
+  selected: palette.blue[100],
+  selectedBorder: palette.blue[500],
+  selectedText: palette.blue[700],
+  /** Rewards and Paw Points (Muted Gold). */
+  accent: palette.gold[500],
+  accentStrong: palette.gold[700],
+  accentSoft: palette.gold[100],
+  /** Positive states (Sage Green). */
+  success: palette.sage[700],
+  successSoft: palette.sage[100],
+  warning: palette.gold[700],
+  warningSoft: palette.gold[100],
   danger: palette.danger,
   dangerSoft: palette.dangerSoft,
-  info: palette.info,
-  infoSoft: palette.infoSoft,
+  info: palette.blue[700],
+  infoSoft: palette.blue[100],
   overlay: 'rgba(30, 24, 20, 0.95)',
+  /** Backdrop behind bottom sheets. */
+  scrim: 'rgba(30, 24, 20, 0.35)',
   photoBackdrop: palette.white,
 } as const;
 
