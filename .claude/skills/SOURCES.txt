@@ -1,0 +1,4 @@
+obra__superpowers 22f0b46 https://github.com/obra/superpowers.git
+software-mansion__argent 9587897 https://github.com/software-mansion/argent.git
+supabase__agent-skills c9be0e9 https://github.com/supabase/agent-skills.git
+superwall__skills 1ae866a https://github.com/superwall/skills.git
