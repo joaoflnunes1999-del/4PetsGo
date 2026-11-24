@@ -4,6 +4,7 @@ import { StyleSheet, View } from 'react-native';
 
 import { PriceBreakdown } from '@/components/booking/PriceBreakdown';
 import { ThreadCard } from '@/components/booking/ThreadCard';
+import { PawCoin } from '@/components/levels/PawCoin';
 import { PetAvatar } from '@/components/pets/PetAvatar';
 import { Badge, Button, Card, ConfirmSheet, EmptyState, Icon, Screen, Text } from '@/components/ui';
 import type { OfferParty } from '@/domain/types';
@@ -103,7 +104,7 @@ export default function RequestDetail() {
           </Text>
           <PriceBreakdown q={q} />
           <View style={styles.row}>
-            <Icon name="mci:paw" size={16} color="accentStrong" />
+            <PawCoin size={18} />
             <Text variant="caption" color="textMuted" style={styles.flex}>
               {lockedSitter.firstName} gagnera {missionPawPoints({ ownerClub: owner.ownerClub, firstMission: lockedSitter.completedMissions === 0 })} Paw Points à la fin de la mission.
             </Text>

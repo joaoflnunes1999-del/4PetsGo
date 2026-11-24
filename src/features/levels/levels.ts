@@ -1,21 +1,20 @@
 import type { LevelId } from '@/domain/types';
-import type { IconName } from '@/components/ui/Icon';
 
+/** Level emblem = numbered paw image (see components/levels/LevelIcon). */
 export type Level = {
   id: LevelId;
+  rank: 1 | 2 | 3 | 4 | 5;
   name: string;
-  animal: string;
-  icon: IconName;
   minPoints: number;
 };
 
 /** ⚠️ Seuils indicatifs (PRD §3.10) — configurable. */
 export const LEVELS: readonly Level[] = [
-  { id: 'beginner', name: 'Beginner', animal: 'Canari', icon: 'mci:bird', minPoints: 0 },
-  { id: 'explorer', name: 'Explorer', animal: 'Lapin', icon: 'mci:rabbit', minPoints: 200 },
-  { id: 'advanced', name: 'Advanced', animal: 'Chat', icon: 'mci:cat', minPoints: 600 },
-  { id: 'expert', name: 'Expert', animal: 'Labrador', icon: 'mci:dog', minPoints: 1500 },
-  { id: 'master', name: 'Master', animal: 'Doberman', icon: 'mci:dog-side', minPoints: 3000 },
+  { id: 'beginner', rank: 1, name: 'Beginner', minPoints: 0 },
+  { id: 'explorer', rank: 2, name: 'Explorer', minPoints: 200 },
+  { id: 'advanced', rank: 3, name: 'Advanced', minPoints: 600 },
+  { id: 'expert', rank: 4, name: 'Expert', minPoints: 1500 },
+  { id: 'master', rank: 5, name: 'Master', minPoints: 3000 },
 ];
 
 export function levelFor(points: number): Level {

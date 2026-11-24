@@ -1,6 +1,7 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 
+import { LevelIcon } from '@/components/levels/LevelIcon';
 import { KeyTiles } from '@/components/sitters/KeyTiles';
 import { LevelBadge } from '@/components/sitters/LevelBadge';
 import { Rating } from '@/components/sitters/Rating';
@@ -139,10 +140,10 @@ export default function SitterProfileScreen() {
       </View>
 
       <Card style={styles.levelCard}>
-        <Icon name={level.icon} size={24} color="primary" />
+        <LevelIcon level={level.id} size={44} />
         <View style={styles.flex}>
           <Text variant="bodyStrong">
-            Niveau {level.name} · {level.animal}
+            Niveau {level.rank} · {level.name}
           </Text>
           <Text variant="caption" color="textMuted">
             {sitter.completedMissions} mission{sitter.completedMissions > 1 ? 's' : ''} réalisée{sitter.completedMissions > 1 ? 's' : ''}

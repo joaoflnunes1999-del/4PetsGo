@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { CityPicker } from '@/components/CityPicker';
+import { LevelIcon } from '@/components/levels/LevelIcon';
 import { LevelBadge } from '@/components/sitters/LevelBadge';
 import { SitterAvatar } from '@/components/sitters/SitterAvatar';
 import { Button, Card, ConfirmSheet, Icon, InfoRow, Screen, Sheet, Text } from '@/components/ui';
@@ -59,7 +60,7 @@ export default function ProfileTab() {
               return (
                 <>
                   <Text variant="body">
-                    Niveau {level.name} ({level.animal}) · commission de {Math.round(SITTER_COMMISSION_RATE[level.id] * 100)}{'\u00a0'}%
+                    Niveau {level.rank} · {level.name} · commission de {Math.round(SITTER_COMMISSION_RATE[level.id] * 100)}{'\u00a0'}%
                   </Text>
                   {next ? (
                     <>
@@ -76,8 +77,11 @@ export default function ProfileTab() {
             })()}
             <View style={styles.levels}>
               {LEVELS.map((l) => (
-                <View key={l.id} style={styles.levelItem}>
-                  <Icon name={l.icon} size={18} color="primary" />
+                <View
+                  key={l.id}
+                  style={[styles.levelItem, l.id === levelProgress(mySitter.pawPoints).level.id ? null : styles.levelOther]}
+                  testID={`level-${l.id}`}>
+                  <LevelIcon level={l.id} size={40} />
                   <Text variant="caption">{l.name}</Text>
                   <Text variant="caption" color="textMuted">
                     {Math.round(SITTER_COMMISSION_RATE[l.id] * 100)}{'\u00a0'}%
@@ -140,4 +144,6 @@ const styles = StyleSheet.create({
   fill: { height: 8, borderRadius: 4, backgroundColor: colors.accent },
   levels: { flexDirection: 'row', justifyContent: 'space-between' },
   levelItem: { alignItems: 'center', gap: spacing.xxs },
+  /** Levels not yet reached are dimmed; the current one stays fully visible. */
+  levelOther: { opacity: 0.45 },
 });
