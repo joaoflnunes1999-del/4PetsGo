@@ -33,7 +33,7 @@ export function levelProgress(points: number): { level: Level; next?: Level; pro
 }
 
 /** ⚠️ Valeurs indicatives (PRD §3.10). */
-export const PAW_REWARDS = { missionCompleted: 30, firstMissionBonus: 20, profileComplete: 20, scheduledPhoto: 2 } as const;
+export const PAW_REWARDS = { missionCompleted: 30, firstMissionBonus: 20, profileComplete: 20, scheduledPhoto: 2, firstNightUpdate: 5 } as const;
 export const OWNER_CLUB_PAW_MULTIPLIER = 1.5;
 
 /** Paw Points a sitter would earn for completing a mission (shown before acceptance). */

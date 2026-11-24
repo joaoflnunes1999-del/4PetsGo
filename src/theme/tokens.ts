@@ -16,6 +16,7 @@ export const palette = {
   terracotta: {
     50: '#FBF3EF',
     100: '#F4E1D8',
+    150: '#EED0C1', // own chat bubbles
     200: '#E8C3B3',
     500: '#B9674E', // Burnt Terracotta — brand, action buttons, accents
     600: '#A35A43', // pressed
@@ -101,6 +102,11 @@ export const colors = {
   dangerSoft: palette.dangerSoft,
   info: palette.blue[700],
   infoSoft: palette.blue[100],
+  /** Chat (WhatsApp-like layout, 4PetsGo palette). */
+  chatBackground: palette.sand[100],
+  bubbleOwn: palette.terracotta[150],
+  bubbleOther: palette.white,
+  readTicks: palette.blue[500],
   overlay: 'rgba(30, 24, 20, 0.95)',
   /** Backdrop behind bottom sheets. */
   scrim: 'rgba(30, 24, 20, 0.35)',

@@ -22,6 +22,8 @@ import {
   respond,
   type NegotiationAction,
 } from '@/features/booking/negotiation';
+import type { ChatFile, ChatMessage, ChatParty, FirstNightUpdate, MissionChat } from '@/features/chat/types';
+import { PAW_REWARDS } from '@/features/levels/levels';
 import { getCity } from '@/features/sitters/cities';
 import { DEMO_SITTERS } from '@/features/sitters/demoSitters';
 
@@ -38,6 +40,8 @@ type State = {
   pets: PetProfile[];
   photos: PetPhoto[];
   requests: BookingRequest[];
+  /** Mission chats keyed by request id (local demo until Supabase is connected). */
+  chats: Record<string, MissionChat>;
 };
 
 type Actions = {
@@ -71,10 +75,15 @@ type Actions = {
   }) => Result;
   cancel: (requestId: string) => Result;
   refreshExpiry: () => void;
+  /** Phase 2 stand-in for payment (founder-approved): opens the chat and creates the drop-off code. */
+  confirmMission: (requestId: string) => Result;
+  sendChatMessage: (requestId: string, from: ChatParty, body: string) => void;
+  sendChatFile: (requestId: string, from: ChatParty, file: ChatFile) => void;
+  answerFirstNight: (requestId: string, answer: Pick<FirstNightUpdate, 'night' | 'morning' | 'comment' | 'photo'>) => Result;
   resetAll: () => void;
 };
 
-const initial: State = { pets: [], photos: [], requests: [] };
+const initial: State = { pets: [], photos: [], requests: [], chats: {} };
 
 const toMessage = (e: unknown) =>
   e instanceof NegotiationError ? NEGOTIATION_ERROR_MESSAGES[e.code] : 'Une erreur inattendue est survenue.';
@@ -196,14 +205,74 @@ export const useAppStore = create<State & Actions>()(
         });
       },
 
+      confirmMission: (requestId) => {
+        const req = get().requests.find((r) => r.id === requestId);
+        if (!req || req.status !== 'locked') return { ok: false, error: 'La mission n’est pas encore verrouillée.' };
+        if (get().chats[requestId]) return { ok: true };
+        const now = new Date().toISOString();
+        const chat: MissionChat = {
+          requestId,
+          status: 'confirmed',
+          dropoffCode: String(Math.floor(Math.random() * 1_000_000)).padStart(6, '0'),
+          confirmedAt: now,
+          messages: [
+            { id: newId('msg'), from: 'system', kind: 'event', body: 'Mission confirmée · le chat est ouvert', createdAt: now },
+            { id: newId('msg'), from: 'system', kind: 'firstNight', createdAt: now },
+          ],
+          firstNight: { status: 'pending', rewardPoints: PAW_REWARDS.firstNightUpdate },
+        };
+        set((s) => ({ chats: { ...s.chats, [requestId]: chat } }));
+        return { ok: true };
+      },
+
+      // Messages are append-only: there is deliberately no edit/delete action (founder rule).
+      sendChatMessage: (requestId, from, body) => {
+        const text = body.trim();
+        if (!text) return;
+        set((s) => {
+          const chat = s.chats[requestId];
+          if (!chat) return s;
+          const msg: ChatMessage = { id: newId('msg'), from, kind: 'text', body: text, createdAt: new Date().toISOString() };
+          return { chats: { ...s.chats, [requestId]: { ...chat, messages: [...chat.messages, msg] } } };
+        });
+      },
+
+      sendChatFile: (requestId, from, file) =>
+        set((s) => {
+          const chat = s.chats[requestId];
+          if (!chat) return s;
+          const msg: ChatMessage = { id: newId('msg'), from, kind: 'file', file, createdAt: new Date().toISOString() };
+          return { chats: { ...s.chats, [requestId]: { ...chat, messages: [...chat.messages, msg] } } };
+        }),
+
+      answerFirstNight: (requestId, answer) => {
+        const chat = get().chats[requestId];
+        if (!chat) return { ok: false, error: 'Chat introuvable.' };
+        if (chat.firstNight.status === 'answered') return { ok: false, error: 'Le First Night Update a déjà été envoyé.' };
+        if (!answer.night || !answer.morning) return { ok: false, error: 'Répondez aux deux questions.' };
+        const now = new Date().toISOString();
+        set((s) => ({
+          chats: {
+            ...s.chats,
+            [requestId]: {
+              ...chat,
+              firstNight: { ...chat.firstNight, ...answer, comment: answer.comment?.trim() || undefined, status: 'answered', answeredAt: now },
+            },
+          },
+        }));
+        return { ok: true };
+      },
+
       resetAll: () => {
         get().photos.forEach((ph) => deletePhotoFile(ph.uri));
-        set({ ...initial, role: undefined, owner: undefined, mySitter: undefined });
+        set({ ...initial, chats: {}, role: undefined, owner: undefined, mySitter: undefined });
       },
     }),
     {
       name: '4petsgo-local-v1',
-      version: 1,
+      version: 2,
+      // v2 adds mission chats.
+      migrate: (persisted) => ({ chats: {}, ...(persisted as object) }) as State & Actions,
       storage: createJSONStorage(() => AsyncStorage),
     },
   ),
