@@ -10,6 +10,7 @@ function sitter(id: string, over: Partial<SitterProfile>): SitterProfile {
   return {
     id,
     firstName: id,
+    age: 30,
     avatarSeed: 1,
     cityId: 'paris',
     location: PARIS,

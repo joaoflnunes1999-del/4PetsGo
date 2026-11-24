@@ -104,6 +104,8 @@ export type SitterService = {
 export type SitterProfile = {
   id: string;
   firstName: string;
+  /** Age in years (shown on the public profile). */
+  age: number;
   photoUri?: string;
   avatarSeed: number; // used for the generated avatar when no photo
   cityId: string;

@@ -35,6 +35,7 @@ function ToggleRow({ label, value, onChange }: { label: string; value: boolean; 
 export default function SitterOnboarding() {
   const complete = useAppStore((s) => s.completeSitterOnboarding);
   const [firstName, setFirstName] = useState('');
+  const [ageText, setAgeText] = useState('');
   const [cityId, setCityId] = useState<string>();
   const [bio, setBio] = useState('');
   const [experience, setExperience] = useState(1);
@@ -74,8 +75,12 @@ export default function SitterOnboarding() {
     }
   }
   const walkCents = parseMoneyInput(walkPrice);
+  const age = Number(ageText);
+  const ageError = ageText && (!Number.isInteger(age) || age < 18 || age > 99) ? 'Vous devez avoir au moins 18 ans' : undefined;
   const valid =
     firstName.trim().length >= 2 &&
+    !!ageText &&
+    !ageError &&
     !!cityId &&
     services.length > 0 &&
     sizes.length > 0 &&
@@ -98,6 +103,7 @@ export default function SitterOnboarding() {
     const profile: SitterProfile = {
       id: 'sitter-me',
       firstName: firstName.trim(),
+      age,
       avatarSeed: 1,
       cityId: city.id,
       location: { lat: city.lat, lng: city.lng },
@@ -124,6 +130,7 @@ export default function SitterOnboarding() {
     <Screen back footer={<Button label="Publier mon profil" disabled={!valid} onPress={submit} testID="sitter-submit" />}>
       <Text variant="displayM">Votre profil Pet Sitter</Text>
       <Input label="Prénom" value={firstName} onChangeText={setFirstName} autoCapitalize="words" testID="sitter-firstname" />
+      <Input label="Âge" value={ageText} onChangeText={setAgeText} keyboardType="number-pad" suffix="ans" error={ageError} testID="sitter-age" />
       <Text variant="title">Ville</Text>
       <CityPicker value={cityId} onChange={setCityId} />
       <Input

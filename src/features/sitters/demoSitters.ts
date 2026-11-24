@@ -48,6 +48,7 @@ const seeds: Seed[] = [
   {
     id: 'sitter-camille',
     firstName: 'Camille',
+    age: 34,
     cityId: 'paris',
     offset: [1.2, -0.8],
     radiusKm: 10,
@@ -71,6 +72,7 @@ const seeds: Seed[] = [
   {
     id: 'sitter-yanis',
     firstName: 'Yanis',
+    age: 22,
     cityId: 'paris',
     offset: [-2.4, 2.1],
     radiusKm: 15,
@@ -92,6 +94,7 @@ const seeds: Seed[] = [
   {
     id: 'sitter-ines',
     firstName: 'Inès',
+    age: 41,
     cityId: 'paris',
     offset: [3.5, 4.2],
     radiusKm: 20,
@@ -114,6 +117,7 @@ const seeds: Seed[] = [
   {
     id: 'sitter-lea',
     firstName: 'Léa',
+    age: 27,
     cityId: 'paris',
     offset: [0.4, 1.1],
     radiusKm: 8,
@@ -135,6 +139,7 @@ const seeds: Seed[] = [
   {
     id: 'sitter-marc',
     firstName: 'Marc',
+    age: 46,
     cityId: 'paris',
     offset: [-4.8, -3.2],
     radiusKm: 25,
@@ -159,6 +164,7 @@ const seeds: Seed[] = [
   {
     id: 'sitter-sarah',
     firstName: 'Sarah',
+    age: 31,
     cityId: 'lyon',
     offset: [0.8, 0.5],
     radiusKm: 12,
@@ -181,6 +187,7 @@ const seeds: Seed[] = [
   {
     id: 'sitter-hugo',
     firstName: 'Hugo',
+    age: 38,
     cityId: 'lyon',
     offset: [-2.5, 3],
     radiusKm: 20,
@@ -203,6 +210,7 @@ const seeds: Seed[] = [
   {
     id: 'sitter-nora',
     firstName: 'Nora',
+    age: 29,
     cityId: 'geneve',
     offset: [0.9, -1.2],
     radiusKm: 10,
@@ -226,6 +234,7 @@ const seeds: Seed[] = [
   {
     id: 'sitter-luca',
     firstName: 'Luca',
+    age: 24,
     cityId: 'geneve',
     offset: [-2.2, 2.8],
     radiusKm: 18,
@@ -247,6 +256,7 @@ const seeds: Seed[] = [
   {
     id: 'sitter-emma',
     firstName: 'Emma',
+    age: 33,
     cityId: 'geneve',
     offset: [2.6, 3.5],
     radiusKm: 15,
@@ -266,6 +276,7 @@ const seeds: Seed[] = [
   {
     id: 'sitter-julien',
     firstName: 'Julien',
+    age: 36,
     cityId: 'lausanne',
     offset: [0.6, 0.4],
     radiusKm: 12,
@@ -284,6 +295,7 @@ const seeds: Seed[] = [
   {
     id: 'sitter-chloe',
     firstName: 'Chloé',
+    age: 52,
     cityId: 'marseille',
     offset: [1.5, 1],
     radiusKm: 15,
