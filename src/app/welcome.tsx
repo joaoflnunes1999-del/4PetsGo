@@ -3,6 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { Logo } from '@/components/Logo';
 import { Button, Icon, Text, type IconName } from '@/components/ui';
 import { colors, layout, radius, spacing } from '@/theme';
 
@@ -16,15 +17,10 @@ export default function Welcome() {
   const insets = useSafeAreaInsets();
   return (
     <View style={styles.root}>
-      <StatusBar style="light" />
+      <StatusBar style="dark" />
       <View style={[styles.hero, { paddingTop: insets.top + spacing.xxxl }]}>
-        <View style={styles.logo}>
-          <Icon name="mci:paw" size={30} color="primary" />
-        </View>
-        <Text variant="displayL" color="textInverse" align="center" style={styles.brand}>
-          4PetsGo
-        </Text>
-        <Text variant="title" color="textInverse" align="center">
+        <Logo size={150} />
+        <Text variant="title" color="primary" align="center">
           Your Pet, their care, one place!
         </Text>
       </View>
@@ -53,22 +49,14 @@ export default function Welcome() {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.background },
   hero: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.primarySoft,
+    borderBottomLeftRadius: radius.xl,
+    borderBottomRightRadius: radius.xl,
     alignItems: 'center',
     gap: spacing.sm,
     paddingBottom: spacing.xxl,
     paddingHorizontal: layout.screenPadding,
   },
-  logo: {
-    width: 64,
-    height: 64,
-    borderRadius: radius.lg,
-    backgroundColor: colors.surface,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: spacing.sm,
-  },
-  brand: { fontSize: 34, lineHeight: 40 },
   body: {
     flex: 1,
     gap: spacing.xl,
@@ -83,7 +71,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: radius.md,
-    backgroundColor: colors.primarySoft,
+    backgroundColor: colors.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },

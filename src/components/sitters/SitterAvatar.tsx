@@ -6,7 +6,7 @@ import type { SitterProfile } from '@/domain/types';
 import { palette } from '@/theme';
 
 const TONES = [
-  [palette.aloe100, palette.aloe800],
+  [palette.mint300, palette.forest800],
   [palette.honey100, palette.honey600],
   ['#E6E1F2', '#5A4A8C'],
   ['#E1ECF5', '#2F6E9E'],

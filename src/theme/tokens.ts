@@ -3,31 +3,32 @@
  * Never hard-code a colour, font size, spacing or radius in a screen: import from `@/theme`.
  */
 
+/** Colours sampled from the 4PetsGo logo: forest green, leaf green and mint. */
 export const palette = {
-  // Brand — aloe vera green
-  aloe800: '#24603F',
-  aloe700: '#367F5C', // primary actions (white text ≥ 4.8:1)
-  aloe500: '#5FA57F', // brand aloe vera
-  aloe300: '#A8D5B9',
-  aloe100: '#E7F3EC',
-  aloe50: '#F3F9F5',
+  forest900: '#01331A',
+  forest800: '#024622', // logo dark green — primary actions, headings accents
+  leaf600: '#1B8A37',
+  leaf500: '#209C40', // logo "Go" green — brand highlights
+  mint300: '#C2F8C8', // logo background
+  mint200: '#D6F9DB',
+  mint100: '#E5FAE8', // app background (green, not white)
+  mint50: '#F2FCF4',
   // Warm highlight, used sparingly (Paw Points, ratings, "new" tags)
-  honey600: '#B7791F',
+  honey600: '#A86B12',
   honey500: '#E9A23B',
   honey100: '#FDF2DF',
 
-  // Neutrals (clean, near-white marketplace look)
-  ink: '#171A18',
-  slate: '#646A66',
-  stone: '#9BA19D',
-  line: '#E6E8E6',
-  mist: '#F4F5F4',
+  // Green-tinted neutrals
+  ink: '#10291A',
+  slate: '#4D6656',
+  stone: '#8BA393',
+  line: '#C9E8D0',
   white: '#FFFFFF',
 
   // Feedback
-  success: '#2F8A5B',
-  successSoft: '#E3F3EA',
-  warning: '#B7791F',
+  success: '#1B8A37',
+  successSoft: '#D6F5DD',
+  warning: '#A86B12',
   warningSoft: '#FBF0DA',
   danger: '#C2413A',
   dangerSoft: '#F9E5E3',
@@ -36,19 +37,19 @@ export const palette = {
 } as const;
 
 export const colors = {
-  background: palette.white,
+  background: palette.mint100,
   surface: palette.white,
-  surfaceMuted: palette.mist,
+  surfaceMuted: palette.mint50,
   border: palette.line,
   text: palette.ink,
   textMuted: palette.slate,
   textSubtle: palette.stone,
   textInverse: palette.white,
-  primary: palette.aloe700,
-  primaryPressed: palette.aloe800,
-  primarySoft: palette.aloe100,
-  brand: palette.aloe500,
-  brandTint: palette.aloe50,
+  primary: palette.forest800,
+  primaryPressed: palette.forest900,
+  primarySoft: palette.mint300,
+  brand: palette.leaf500,
+  brandTint: palette.mint200,
   accent: palette.honey500,
   accentStrong: palette.honey600,
   accentSoft: palette.honey100,
@@ -60,7 +61,7 @@ export const colors = {
   dangerSoft: palette.dangerSoft,
   info: palette.info,
   infoSoft: palette.infoSoft,
-  overlay: 'rgba(17, 20, 18, 0.94)',
+  overlay: 'rgba(1, 26, 13, 0.95)',
   photoBackdrop: palette.white,
 } as const;
 
