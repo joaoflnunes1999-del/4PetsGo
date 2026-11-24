@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
   backButton: { padding: spacing.sm },
   scrollContent: { flexGrow: 1 },
   inner: { flex: 1, width: '100%', maxWidth: layout.maxContentWidth, alignSelf: 'center' },
-  padded: { paddingHorizontal: layout.screenPadding, gap: spacing.lg },
+  padded: { paddingHorizontal: layout.screenPadding, gap: layout.sectionGap },
   footer: {
     paddingHorizontal: layout.screenPadding,
     paddingTop: spacing.md,

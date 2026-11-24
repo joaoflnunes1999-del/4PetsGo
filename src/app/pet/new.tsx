@@ -73,7 +73,7 @@ export default function NewPet() {
                 setStep('breed');
               }}
               style={({ pressed }) => [styles.speciesCard, pressed ? styles.pressed : null]}>
-              <BreedImage breedId={sp === 'dog' ? 'dog-mixed' : 'cat-mixed'} species={sp} size={120} rounded={radius.lg} />
+              <BreedImage breedId={sp === 'dog' ? 'dog-mixed' : 'cat-mixed'} species={sp} size={120} rounded={60} />
               <Text variant="displayS">{sp === 'dog' ? 'Un chien' : 'Un chat'}</Text>
             </Pressable>
           ))}
@@ -99,7 +99,7 @@ export default function NewPet() {
         <Text variant="displayM">Quelle est sa race ?</Text>
         {breedId ? (
           <Card style={styles.preview}>
-            <BreedImage breedId={breedId} species={species} size={96} rounded={radius.md} />
+            <BreedImage breedId={breedId} species={species} size={96} rounded={48} />
             <View style={styles.flex}>
               <Text variant="bodyStrong">{getBreed(breedId).name}</Text>
               <Text variant="caption" color="textMuted">
@@ -121,7 +121,7 @@ export default function NewPet() {
                 accessibilityLabel={b.name}
                 onPress={() => setBreedId(b.id)}
                 style={[styles.breedRow, selected ? styles.breedSelected : null]}>
-                <BreedImage breedId={b.id} species={species} size={44} rounded={radius.sm} />
+                <BreedImage breedId={b.id} species={species} size={44} rounded={22} />
                 <Text variant="body" style={styles.flex}>
                   {b.name}
                 </Text>

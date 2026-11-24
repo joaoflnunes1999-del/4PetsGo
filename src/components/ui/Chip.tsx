@@ -47,6 +47,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   idle: { backgroundColor: colors.surface, borderColor: colors.border },
-  selected: { backgroundColor: colors.primarySoft, borderColor: colors.primary },
+  selected: { backgroundColor: colors.selected, borderColor: colors.primary },
   pressed: { opacity: 0.8 },
 });

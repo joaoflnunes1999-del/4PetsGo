@@ -2,7 +2,7 @@ import { Image } from 'expo-image';
 import { StyleSheet, View } from 'react-native';
 
 import { Text } from '@/components/ui';
-import { colors, fontFamily } from '@/theme';
+import { colors, fontFamily, palette } from '@/theme';
 
 /** Brand lockup: house + paw mark, "4Pets" in forest green and "Go" in leaf green (as in the logo). */
 export function Logo({ size = 120, wordmark = true }: { size?: number; wordmark?: boolean }) {
@@ -23,5 +23,5 @@ const styles = StyleSheet.create({
   wrap: { alignItems: 'center' },
   word: { fontFamily: fontFamily.displayBold, letterSpacing: -0.5 },
   forest: { color: colors.primary },
-  leaf: { color: colors.brand },
+  leaf: { color: palette.logoLeaf },
 });

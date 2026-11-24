@@ -9,78 +9,81 @@ import { colors, radius, spacing } from '@/theme';
 
 import { PetAvatar } from './PetAvatar';
 
-/** Marketplace-style grid tile: square visual first, compact text underneath. */
+/** Grid tile: circular profile photo (brand rule), name and breed underneath. */
 export function PetTile({ pet, size, onPress }: { pet: PetProfile; size: number; onPress: () => void }) {
   const count = useAppStore((s) => s.photos.filter((p) => p.petId === pet.id).length);
   const age = formatAge(pet);
+  const photo = Math.min(size - spacing.xl, 150);
   return (
     <Pressable
       testID={`pet-card-${pet.name}`}
       accessibilityRole="button"
       accessibilityLabel={`Profil de ${pet.name}`}
       onPress={onPress}
-      style={({ pressed }) => [{ width: size }, pressed ? styles.pressed : null]}>
-      <View style={styles.visual}>
-        <PetAvatar pet={pet} size={size} rounded={radius.md} />
-        <View style={styles.count}>
-          <Icon name="image" size={11} color="textInverse" />
-          <Text variant="label" color="textInverse">
-            {count}
-          </Text>
-        </View>
+      style={({ pressed }) => [styles.tile, { width: size }, pressed ? styles.pressed : null]}>
+      <View style={styles.ring}>
+        <PetAvatar pet={pet} size={photo} />
       </View>
       <View style={styles.meta}>
-        <Text variant="bodyStrong" numberOfLines={1}>
+        <Text variant="title" numberOfLines={1} align="center">
           {pet.name}
         </Text>
-        <Text variant="caption" color="textMuted" numberOfLines={1}>
+        <Text variant="caption" color="textMuted" numberOfLines={1} align="center">
           {[getBreed(pet.breedId).name, age].filter(Boolean).join(' · ')}
         </Text>
+        <View style={styles.count}>
+          <Icon name="image" size={12} color="textMuted" />
+          <Text variant="caption" color="textMuted">
+            {count} photo{count > 1 ? 's' : ''}
+          </Text>
+        </View>
       </View>
     </Pressable>
   );
 }
 
 export function AddPetTile({ size, onPress }: { size: number; onPress: () => void }) {
+  const photo = Math.min(size - spacing.xl, 150);
   return (
     <Pressable
       testID="add-pet"
       accessibilityRole="button"
       accessibilityLabel="Ajouter un animal"
       onPress={onPress}
-      style={({ pressed }) => [styles.add, { width: size, height: size }, pressed ? styles.pressed : null]}>
-      <Icon name="plus" size={26} color="primary" />
-      <Text variant="callout" color="primary">
-        Ajouter un animal
-      </Text>
+      style={({ pressed }) => [styles.tile, { width: size }, pressed ? styles.pressed : null]}>
+      <View style={[styles.add, { width: photo + 8, height: photo + 8 }]}>
+        <Icon name="plus" size={28} color="primary" />
+      </View>
+      <View style={styles.meta}>
+        <Text variant="title" color="primary" align="center">
+          Ajouter un animal
+        </Text>
+      </View>
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  visual: { position: 'relative' },
-  count: {
-    position: 'absolute',
-    left: spacing.sm,
-    bottom: spacing.sm,
-    flexDirection: 'row',
+  tile: {
     alignItems: 'center',
-    gap: spacing.xs,
-    backgroundColor: 'rgba(23,26,24,0.6)',
-    paddingHorizontal: spacing.sm - 2,
-    paddingVertical: spacing.xxs,
-    borderRadius: radius.xs,
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: colors.border,
+    paddingVertical: spacing.xl,
+    paddingHorizontal: spacing.md,
   },
-  meta: { paddingTop: spacing.sm, gap: spacing.xxs },
+  ring: { padding: 4, borderRadius: radius.pill, borderWidth: 2, borderColor: colors.brand },
+  meta: { paddingTop: spacing.md, gap: spacing.xxs, alignSelf: 'stretch', alignItems: 'center' },
+  count: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs, marginTop: spacing.xs },
   add: {
-    borderRadius: radius.md,
+    borderRadius: radius.pill,
     borderWidth: 1.5,
     borderStyle: 'dashed',
-    borderColor: colors.brand,
-    backgroundColor: colors.brandTint,
+    borderColor: colors.primary,
+    backgroundColor: colors.selected,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: spacing.xs,
   },
   pressed: { opacity: 0.8 },
 });

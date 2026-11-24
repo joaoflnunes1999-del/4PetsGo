@@ -5,12 +5,12 @@ import { Text } from '@/components/ui';
 import type { SitterProfile } from '@/domain/types';
 import { palette } from '@/theme';
 
+/** Initials avatars stay within the brand palette. */
 const TONES = [
-  [palette.mint300, palette.forest800],
-  [palette.honey100, palette.honey600],
-  ['#E6E1F2', '#5A4A8C'],
-  ['#E1ECF5', '#2F6E9E'],
-  ['#F5E3E8', '#9C3D5A'],
+  [palette.pastel, palette.forest],
+  [palette.peachLight, palette.peachText],
+  [palette.mist, palette.charcoal],
+  [palette.pastelLight, palette.forest],
 ] as const;
 
 export function SitterAvatar({ sitter, size }: { sitter: SitterProfile; size: number }) {

@@ -28,7 +28,7 @@ export default function Welcome() {
         {PILLARS.map((p) => (
           <View key={p.title} style={styles.pillar}>
             <View style={styles.pillarIcon}>
-              <Icon name={p.icon} size={20} color="primary" />
+              <Icon name={p.icon} size={20} color="accentStrong" />
             </View>
             <View style={styles.pillarText}>
               <Text variant="bodyStrong">{p.title}</Text>
@@ -68,10 +68,10 @@ const styles = StyleSheet.create({
   },
   pillar: { flexDirection: 'row', gap: spacing.lg, alignItems: 'flex-start' },
   pillarIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: radius.md,
-    backgroundColor: colors.surface,
+    width: 44,
+    height: 44,
+    borderRadius: radius.pill,
+    backgroundColor: colors.accentSoft,
     alignItems: 'center',
     justifyContent: 'center',
   },
