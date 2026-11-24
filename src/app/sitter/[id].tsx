@@ -1,6 +1,7 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 
+import { KeyTiles } from '@/components/sitters/KeyTiles';
 import { LevelBadge } from '@/components/sitters/LevelBadge';
 import { Rating } from '@/components/sitters/Rating';
 import { SitterAvatar } from '@/components/sitters/SitterAvatar';
@@ -8,7 +9,7 @@ import { Badge, Button, Card, Chip, EmptyState, Icon, Screen, Text } from '@/com
 import { levelProgress } from '@/features/levels/levels';
 import { SERVICE_LABELS, SIZE_LABELS } from '@/features/pricing/pricing';
 import { getCity } from '@/features/sitters/cities';
-import { SERVICE_NAMES, sitterFacts } from '@/features/sitters/facts';
+import { SERVICE_NAMES, sitterKeyTiles } from '@/features/sitters/facts';
 import { distanceKm, formatDistance } from '@/features/sitters/geo';
 import { NEW_SITTER_BOOST_MISSIONS } from '@/features/sitters/ranking';
 import { findSitter, useAppStore } from '@/store/useAppStore';
@@ -16,8 +17,8 @@ import { useSearchStore } from '@/store/useSearchStore';
 import { colors, radius, spacing } from '@/theme';
 
 /**
- * Public sitter profile. Order (founder's request): who they are and where the pet would live
- * (age, home, outdoor, children, resident animals) → about → services. No prices here:
+ * Public sitter profile. Order (founder's request): identity (name, age, city) → 4 key tiles
+ * (≈ 10 % of the screen: icon + short value) → about → services. No prices here:
  * the price is set per request and negotiated.
  */
 export default function SitterProfileScreen() {
@@ -44,7 +45,6 @@ export default function SitterProfileScreen() {
   const offersService = sitter.services.some((s) => s.type === service);
   const selected = selectedSitterIds.includes(sitter.id);
   const isOwner = role === 'owner';
-  const facts = sitterFacts(sitter);
 
   return (
     <Screen
@@ -86,24 +86,7 @@ export default function SitterProfileScreen() {
         <Rating sitter={sitter} />
       </View>
 
-      <View style={styles.section}>
-        <Text variant="title">{sitter.home ? 'Son cadre de vie' : 'En bref'}</Text>
-        <Card style={styles.factsCard} testID="sitter-facts">
-          {facts.map((f, i) => (
-            <View key={f.key} style={[styles.fact, i < facts.length - 1 ? styles.factDivider : null]}>
-              <View style={styles.factIcon}>
-                <Icon name={f.icon} size={16} color="primary" />
-              </View>
-              <Text variant="callout" color="textMuted" style={styles.factLabel}>
-                {f.label}
-              </Text>
-              <Text variant="bodyStrong" style={styles.factValue}>
-                {f.value}
-              </Text>
-            </View>
-          ))}
-        </Card>
-      </View>
+      <KeyTiles tiles={sitterKeyTiles(sitter)} />
 
       {sitter.bio ? (
         <View style={styles.section}>
@@ -197,19 +180,6 @@ const styles = StyleSheet.create({
   hero: { alignItems: 'center', gap: spacing.sm, paddingTop: spacing.sm },
   badges: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xs, justifyContent: 'center' },
   section: { gap: spacing.sm },
-  factsCard: { paddingVertical: spacing.xs },
-  fact: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingVertical: spacing.md },
-  factDivider: { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.border },
-  factIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: radius.md,
-    backgroundColor: colors.brandTint,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  factLabel: { flex: 1 },
-  factValue: { flexShrink: 1, textAlign: 'right', maxWidth: '55%' },
   service: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
   serviceIcon: {
     width: 40,

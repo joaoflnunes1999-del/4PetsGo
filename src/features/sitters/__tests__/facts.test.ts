@@ -1,23 +1,27 @@
 import { DEMO_SITTERS } from '../demoSitters';
-import { sitterFacts, sitterHighlights } from '../facts';
+import { sitterHighlights, sitterKeyTiles } from '../facts';
 
 const byId = (id: string) => DEMO_SITTERS.find((s) => s.id === id)!;
 
-describe('sitter facts', () => {
-  it('lists age first, then home details before experience', () => {
-    const keys = sitterFacts(byId('sitter-ines')).map((f) => f.key);
-    expect(keys[0]).toBe('age');
-    expect(keys.slice(1, 6)).toEqual(['housing', 'balcony', 'garden', 'children', 'animals']);
-    expect(keys.indexOf('experience')).toBeGreaterThan(keys.indexOf('animals'));
-  });
-
-  it('has no home facts for sitters who do not offer boarding', () => {
-    const keys = sitterFacts(byId('sitter-julien')).map((f) => f.key);
-    expect(keys).toEqual(['age', 'experience', 'radius']);
-  });
-
+describe('sitterHighlights', () => {
   it('builds short highlights for result cards', () => {
     expect(sitterHighlights(byId('sitter-ines'))).toEqual(['41 ans', 'Maison 120 m²', 'Jardin', 'Enfants', 'Sans animaux']);
     expect(sitterHighlights(byId('sitter-camille'))).toContain('Animaux au foyer');
+  });
+});
+
+describe('sitterKeyTiles', () => {
+  it('returns exactly 4 short tiles for boarding sitters: home, outdoor, children, animals', () => {
+    const t = sitterKeyTiles(byId('sitter-ines'));
+    expect(t).toHaveLength(4);
+    expect(t.map((x) => x.value)).toEqual(['120 m²', 'Jardin', 'Enfants', 'Aucun']);
+    expect(t[0].icon).toBe('mci:home-variant-outline');
+    expect(sitterKeyTiles(byId('sitter-camille'))[0].icon).toBe('mci:office-building-outline');
+    expect(sitterKeyTiles(byId('sitter-camille'))[1].value).toBe('Balcon');
+  });
+  it('falls back to radius, experience, missions, dogs for sitters without boarding', () => {
+    const t = sitterKeyTiles(byId('sitter-yanis'));
+    expect(t.map((x) => x.key)).toEqual(['radius', 'experience', 'missions', 'dogs']);
+    expect(t.every((x) => x.value.length <= 13)).toBe(true);
   });
 });
