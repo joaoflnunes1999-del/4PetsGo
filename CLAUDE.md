@@ -69,15 +69,19 @@ docs/                      # PRD, roadmap
 ## Décisions techniques
 
 - **Design system** : toute couleur, taille, espacement ou rayon vient de `@/theme`. Pas de valeur en dur dans les écrans.
-- **Identité visuelle** (validée le 24/11/2026, remplace les versions précédentes) : moderne, minimaliste, premium, chaleureuse et intuitive, avec la simplicité de Vinted et d'Uber. Palette :
-  - vert pastel `#B9D8C5`, couleur principale (bandeaux, badges, anneaux d'avatar) ;
-  - vert forêt `#244C3B` pour les boutons importants, les icônes et les éléments de contraste ;
-  - blanc chaud `#F7F6F0` pour les fonds principaux (cartes en blanc) ;
-  - vert brume `#E7EDE7` pour les fonds secondaires et les éléments sélectionnés ;
-  - pêche doux `#E9B98E` pour les petites touches décoratives (Paw Points, « Nouveau »), décliné en `#8A5A33` pour le texte ;
-  - gris charbon `#343B37` pour les textes et les titres.
+- **Identité visuelle** (validée le 24/11/2026, remplace les versions précédentes) : moderne, minimaliste, premium, chaleureuse et intuitive, avec la simplicité de Vinted et d'Uber, dans une palette naturelle :
+  - terracotta `#C8795B`, couleur principale et boutons d'action (`colors.action`) ;
+  - brun terre `#713F32` pour les contrastes, les éléments importants, les icônes et les liens (`colors.primary`) ;
+  - crème `#F8F3EC` pour les fonds principaux ;
+  - beige rosé `#EAD9CC` pour les fonds secondaires et les cartes (`colors.surface`) ;
+  - vert sauge `#A9B5A0` pour certains détails et les éléments sélectionnés (`colors.selected`, `colors.accent`) ;
+  - gris charbon `#34312E` pour les textes et les titres.
 
-  Typographie **Inter uniquement**, en Regular, Medium, SemiBold et Bold. Coins légèrement arrondis (10 px), espacements généreux (20 px), icônes simples. **Toutes les photos de profil sont parfaitement circulaires**, pour les utilisateurs comme pour les animaux (les photos de la galerie restent carrées). Le logo garde ses couleurs d'origine (`palette.logoLeaf` pour « Go »).
+  **Toutes les couleurs et leurs variantes** sont dans `palette` (échelles terracotta, earth, beige, sage, charcoal) dans `src/theme/tokens.ts`. Les écrans n'utilisent que les tokens sémantiques `colors.*`.
+  - Typographie Inter uniquement, en Regular, Medium, SemiBold et Bold. Coins légèrement arrondis (10 px), espacements généreux (20 px).
+  - Photos de profil parfaitement circulaires, pour les utilisateurs comme pour les animaux.
+  - Contraste : un texte blanc sur terracotta donne 3,3:1. Les libellés de boutons sont donc en Bold 16 (variante `button`). Le texte et les icônes de couleur utilisent le brun terre (7,7:1) ou `terracotta[700]` (4,9:1), jamais le terracotta 500.
+  - Le logo intégré à l'app (`logo-mark.png`, composant `Logo`) est recoloré en brun terre, avec « Go » en terracotta. L'icône de l'app et le splash gardent le logo vert d'origine, en attente d'une décision du fondateur.
 - **Profil Pet Sitter** : d'abord l'identité et le cadre de vie (âge, logement et surface, balcon, extérieur, enfants, animaux au foyer), puis la présentation, puis les services. **Aucun tarif sur le profil ni sur les cartes de résultats** : le prix apparaît seulement dans la demande, où il est négocié.
 - **Argent en centimes entiers** (`number` en centimes), arrondi au centime à chaque étape. Devise : EUR pour la France, CHF pour la Suisse, selon le pays de l'Owner.
 - **La logique métier est pure et testée** (pricing, négociation, classement). Les écrans ne font qu'appeler ces fonctions. En phase 2, le verrouillage et les règles de négociation seront ré-implémentés **côté serveur** (fonction Postgres transactionnelle et RLS), et les fonctions TypeScript serviront à l'affichage.
