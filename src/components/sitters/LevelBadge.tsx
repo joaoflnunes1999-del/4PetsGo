@@ -19,7 +19,7 @@ export function LevelBadge({ pawPoints, compact }: { pawPoints: number; compact?
         <>
           <View style={styles.dot} />
           <PawCoin size={18} />
-          <Text variant="badge" color="text">
+          <Text variant="badgeValue" color="text">
             {pawPoints.toLocaleString('fr-FR')}
           </Text>
         </>
