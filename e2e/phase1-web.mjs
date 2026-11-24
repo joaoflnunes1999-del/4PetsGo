@@ -202,8 +202,14 @@ try {
     await id('sitter-submit').click();
     await page.getByText('Aucune demande pour l’instant').waitFor();
     await page.getByRole('tab', { name: /Profil/ }).click();
-    await page.getByText(/commission de 5\s%/).waitFor();
+    await page.getByText('Niveau 1 · Beginner').waitFor();
+    if (await page.getByText(/commission/i).count()) throw new Error('commission must not be shown on the profile tab');
     await shot('sitter-profile-tab');
+    await id('levels-info').click();
+    await id('level-info-master').waitFor();
+    await page.getByText(/Commission la plus basse : 1\s%/).waitFor();
+    await page.waitForTimeout(700); // let the sheet finish sliding in
+    await shot('levels-info');
   });
 } finally {
   const relevant = errors.filter((e) => !/favicon|DevTools/.test(e));
