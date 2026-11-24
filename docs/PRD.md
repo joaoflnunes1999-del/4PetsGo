@@ -137,16 +137,28 @@ Règles validées par le fondateur le 25/11/2026 :
 3. **Le Pet Sitter saisit ce code à la remise de l'animal.** La mission démarre et sa part (prix moins sa commission) est créditée dans son **portefeuille, en statut « Retenu »** jusqu'à la fin de la mission.
 4. À tout moment, le Pet Sitter dispose dans le chat de l'onglet **« Générer le code de remise »** (fin de mission ou fin anticipée). **L'Owner saisit ce code dans le chat** pour valider la fin de la mission.
 5. **Fin anticipée** : avant le dernier jour, le Pet Sitter indique qui met fin à la garde. L'Owner voit ce motif avant de saisir le code.
-   - **Le Pet Sitter se désiste** : l'Owner ne paie que les jours effectués (au prorata) ; le reste lui est remboursé ; aucun Paw Point.
+   - **Le Pet Sitter se désiste** : l'Owner ne paie que les jours effectués (au prorata) ; le reste lui est remboursé, ainsi que **la totalité des frais de 5 %** ; aucun Paw Point.
    - **L'Owner reprend son animal plus tôt** : aucun remboursement.
 6. À la fin de la mission, la part du Pet Sitter passe en statut **« Disponible »**. Il peut alors la **transférer vers son compte bancaire** depuis l'app (versement Stripe Connect).
+
+7. **Annulation avant la remise** (validée le 25/11/2026) :
+
+   | Annulation par l'Owner | Remboursement du prix |
+   |---|---|
+   | plus de 14 jours avant le début | 100 % |
+   | de 3 à 14 jours | 75 % |
+   | de 24 à 72 h | 50 % |
+   | moins de 24 h | 0 % |
+
+   - La part retenue revient au Pet Sitter, moins sa commission.
+   - **Si le Pet Sitter annule, l'Owner est remboursé à 100 %**, frais compris.
+   - **Geste de compassion** : en cas d'urgence comprise par le Pet Sitter, celui-ci peut **renoncer aux frais d'annulation**, et l'Owner est alors remboursé à 100 %. Seul le Pet Sitter peut le faire, tant que la somme n'a pas été transférée.
 
 Sécurité : les codes ne figurent jamais dans les messages ni dans les notifications. Chaque code est limité à 5 essais.
 
 ⚠️ À valider :
-- remboursement des frais Owner de 5 % au prorata en cas de désistement du Pet Sitter ;
 - frais kilométriques du Dog Walking dans le montant payé ;
-- politique d'annulation **avant** la remise (plus de 7 jours : 100 %, de 3 à 7 jours : 75 %, de 24 à 72 h : 50 %, moins de 24 h : 0 %) ;
+- frais Owner de 5 % lors d'une annulation par l'Owner : remboursés selon le même taux (hypothèse en place) ;
 - KYC des Pet Sitters par Stripe avant le premier versement ;
 - conditions de rétention des fonds par Stripe (la plateforme ne présente pas ce mécanisme comme un « séquestre »).
 
@@ -323,7 +335,7 @@ Suivis dans **PostHog**. Les objectifs sont fixés à 3 mois après la publicati
 
 ## 9. Points ouverts (⚠️ à valider avant la mise en production)
 
-1. Politique définitive d'annulation et de remboursement.
+1. ~~Politique d'annulation~~ — validée le 25/11/2026 (voir §3.7).
 2. Financement de la réduction Owner Club de 10 % (voir risque n°1).
 3. Essai gratuit de l'Owner Club.
 4. Contenu et prix des abonnements Pet Sitter (V1.1).
