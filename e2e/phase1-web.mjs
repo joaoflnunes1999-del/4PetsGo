@@ -134,7 +134,8 @@ try {
     await id('send-request').click();
     await page.getByText('Pet Sitters contactés').waitFor();
     await id('request-proposal').fill('10');
-    await page.getByText(/Le minimum 4PetsGo pour cette demande est/).waitFor();
+    await id('request-floor').getByText(/^Prix minimum : /).waitFor();
+    await page.getByText(/Prix minimum : /).nth(1).waitFor(); // field error shows only the amount
     await id('request-proposal').fill('');
     await shot('request-review');
     await id('request-send').click();
@@ -145,7 +146,7 @@ try {
     if (!/^4PG-[A-Z2-9]{6}$/.test(missionId)) throw new Error(`bad mission id ${missionId}`);
     await id('demo-counter-sitter-ines').click();
     await id('counter-input').fill('20');
-    await page.getByText(/^Minimum /).waitFor();
+    await page.getByText(/^Prix minimum : /).first().waitFor();
     await id('counter-input').fill('140');
     await id('counter-submit').click();
     await id('me-counter-sitter-ines').click();
