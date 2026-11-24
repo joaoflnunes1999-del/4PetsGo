@@ -1,9 +1,9 @@
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { Badge, Card, Icon, Text } from '@/components/ui';
-import type { Currency, SitterProfile } from '@/domain/types';
-import { formatMoney } from '@/features/pricing/pricing';
+import type { SitterProfile } from '@/domain/types';
 import { getCity } from '@/features/sitters/cities';
+import { SERVICE_NAMES, sitterHighlights } from '@/features/sitters/facts';
 import { formatDistance } from '@/features/sitters/geo';
 import { colors, radius, spacing } from '@/theme';
 
@@ -15,15 +15,13 @@ type Props = {
   sitter: SitterProfile;
   distanceKm: number;
   boosted: boolean;
-  priceCents?: number;
-  extraCents?: number;
-  currency: Currency;
   selected: boolean;
   onToggle: () => void;
   onPress: () => void;
 };
 
-export function SitterCard({ sitter, distanceKm, boosted, priceCents, extraCents, currency, selected, onToggle, onPress }: Props) {
+/** Result card: identity, then the living-situation highlights owners care about. No price (negotiated per request). */
+export function SitterCard({ sitter, distanceKm, boosted, selected, onToggle, onPress }: Props) {
   return (
     <Card onPress={onPress} style={[styles.card, selected ? styles.selected : null]} testID={`sitter-card-${sitter.id}`} accessibilityLabel={`Profil de ${sitter.firstName}`}>
       <View style={styles.row}>
@@ -49,23 +47,29 @@ export function SitterCard({ sitter, distanceKm, boosted, priceCents, extraCents
           {selected ? <Icon name="check" size={18} color="textInverse" /> : null}
         </Pressable>
       </View>
-      <View style={styles.footer}>
-        <LevelBadge pawPoints={sitter.pawPoints} />
-        {priceCents != null ? (
-          <View style={styles.price}>
-            <Text variant="number">{formatMoney(priceCents + (extraCents ?? 0), currency)}</Text>
-            <Text variant="caption" color="textMuted">
-              {extraCents ? 'avec déplacement' : 'pour la demande'}
+      <View style={styles.tags}>
+        {sitterHighlights(sitter).map((h) => (
+          <View key={h} style={styles.tag}>
+            <Text variant="caption" color="text">
+              {h}
             </Text>
           </View>
-        ) : null}
+        ))}
+      </View>
+      <View style={styles.footer}>
+        <LevelBadge pawPoints={sitter.pawPoints} />
+        <View style={styles.services}>
+          {sitter.services.map((s) => (
+            <Icon key={s.type} name={SERVICE_NAMES[s.type].icon} size={16} color="primary" />
+          ))}
+        </View>
       </View>
     </Card>
   );
 }
 
 const styles = StyleSheet.create({
-  card: { gap: spacing.md, borderWidth: 1.5, borderColor: 'transparent' },
+  card: { gap: spacing.md, borderWidth: 1.5, borderColor: colors.border },
   selected: { borderColor: colors.primary },
   row: { flexDirection: 'row', gap: spacing.md, alignItems: 'center' },
   body: { flex: 1, gap: spacing.xxs },
@@ -80,6 +84,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   checkOn: { backgroundColor: colors.primary, borderColor: colors.primary },
+  tags: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xs },
+  tag: { backgroundColor: colors.brandTint, paddingHorizontal: spacing.sm, paddingVertical: spacing.xxs, borderRadius: radius.xs },
   footer: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  price: { alignItems: 'flex-end' },
+  services: { flexDirection: 'row', gap: spacing.sm },
 });

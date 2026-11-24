@@ -4,27 +4,22 @@ import { StyleSheet, View } from 'react-native';
 import { LevelBadge } from '@/components/sitters/LevelBadge';
 import { Rating } from '@/components/sitters/Rating';
 import { SitterAvatar } from '@/components/sitters/SitterAvatar';
-import { Badge, Button, Card, EmptyState, Icon, InfoRow, Screen, Text } from '@/components/ui';
-import type { HomeDetails, ServiceType } from '@/domain/types';
+import { Badge, Button, Card, Chip, EmptyState, Icon, Screen, Text } from '@/components/ui';
 import { levelProgress } from '@/features/levels/levels';
-import { MIN_DAILY_PRICE } from '@/features/pricing/config';
-import { SERVICE_LABELS, SIZE_LABELS, currencyFor, formatMoney } from '@/features/pricing/pricing';
+import { SERVICE_LABELS, SIZE_LABELS } from '@/features/pricing/pricing';
 import { getCity } from '@/features/sitters/cities';
+import { SERVICE_NAMES, sitterFacts } from '@/features/sitters/facts';
 import { distanceKm, formatDistance } from '@/features/sitters/geo';
 import { NEW_SITTER_BOOST_MISSIONS } from '@/features/sitters/ranking';
 import { findSitter, useAppStore } from '@/store/useAppStore';
 import { useSearchStore } from '@/store/useSearchStore';
 import { colors, radius, spacing } from '@/theme';
 
-const GARDEN: Record<HomeDetails['garden'], string> = {
-  none: 'Pas de jardin',
-  fenced: 'Jardin clôturé',
-  partlyFenced: 'Jardin partiellement clôturé',
-  open: 'Jardin ouvert',
-};
-
-const SERVICE_ICON: Record<ServiceType, 'home' | 'key' | 'mci:walk'> = { boarding: 'home', homeVisits: 'key', dogWalking: 'mci:walk' };
-
+/**
+ * Public sitter profile. Order (founder's request): who they are and where the pet would live
+ * (age, home, outdoor, children, resident animals) → about → services. No prices here:
+ * the price is set per request and negotiated.
+ */
 export default function SitterProfileScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const mySitter = useAppStore((s) => s.mySitter);
@@ -42,8 +37,6 @@ export default function SitterProfileScreen() {
   }
 
   const city = getCity(sitter.cityId);
-  const country = city.country;
-  const currency = currencyFor(country);
   const ownerCity = owner ? getCity(owner.cityId) : undefined;
   const dist = ownerCity ? distanceKm(ownerCity, sitter.location) : undefined;
   const { level, next, remaining } = levelProgress(sitter.pawPoints);
@@ -51,6 +44,7 @@ export default function SitterProfileScreen() {
   const offersService = sitter.services.some((s) => s.type === service);
   const selected = selectedSitterIds.includes(sitter.id);
   const isOwner = role === 'owner';
+  const facts = sitterFacts(sitter);
 
   return (
     <Screen
@@ -78,103 +72,107 @@ export default function SitterProfileScreen() {
         ) : undefined
       }>
       <View style={styles.hero}>
-        <SitterAvatar sitter={sitter} size={96} />
+        <SitterAvatar sitter={sitter} size={92} />
         <Text variant="displayM">{sitter.firstName}</Text>
         <Text variant="callout" color="textMuted">
-          {city.name}, {city.region}
+          {sitter.age} ans · {city.name}
           {dist != null ? ` · ${formatDistance(dist)}` : ''}
         </Text>
         <View style={styles.badges}>
           <LevelBadge pawPoints={sitter.pawPoints} />
-          {boosted ? <Badge label="NOUVEAU SUR 4PETSGO" tone="accent" icon="zap" /> : null}
+          {boosted ? <Badge label="NOUVEAU" tone="accent" icon="zap" /> : null}
           {sitter.identityVerified ? <Badge label="IDENTITÉ VÉRIFIÉE" tone="success" icon="check" /> : null}
         </View>
         <Rating sitter={sitter} />
       </View>
 
-      <Card style={styles.gap}>
-        <View style={styles.levelRow}>
-          <View style={styles.levelIcon}>
-            <Icon name={level.icon} size={26} color="primary" />
-          </View>
-          <View style={styles.flex}>
-            <Text variant="bodyStrong">
-              Niveau {level.name} · {level.animal}
-            </Text>
-            <Text variant="caption" color="textMuted">
-              {sitter.completedMissions} mission{sitter.completedMissions > 1 ? 's' : ''} réalisée{sitter.completedMissions > 1 ? 's' : ''} · {sitter.experienceYears} an
-              {sitter.experienceYears > 1 ? 's' : ''} d’expérience
-            </Text>
-            {next ? (
-              <Text variant="caption" color="textMuted">
-                Encore {remaining} Paw Points avant {next.name}
+      <View style={styles.section}>
+        <Text variant="title">{sitter.home ? 'Son cadre de vie' : 'En bref'}</Text>
+        <Card style={styles.factsCard} testID="sitter-facts">
+          {facts.map((f, i) => (
+            <View key={f.key} style={[styles.fact, i < facts.length - 1 ? styles.factDivider : null]}>
+              <View style={styles.factIcon}>
+                <Icon name={f.icon} size={16} color="primary" />
+              </View>
+              <Text variant="callout" color="textMuted" style={styles.factLabel}>
+                {f.label}
               </Text>
-            ) : null}
-          </View>
-        </View>
-      </Card>
+              <Text variant="bodyStrong" style={styles.factValue}>
+                {f.value}
+              </Text>
+            </View>
+          ))}
+        </Card>
+      </View>
 
       {sitter.bio ? (
-        <View style={styles.gapSm}>
-          <Text variant="title">À propos</Text>
+        <View style={styles.section}>
+          <Text variant="title">À propos de {sitter.firstName}</Text>
           <Text variant="body">{sitter.bio}</Text>
         </View>
       ) : null}
 
-      <View style={styles.gapSm}>
-        <Text variant="title">Services et tarifs</Text>
-        {sitter.services.map((s) => (
-          <Card key={s.type} tone={s.type === service ? 'primarySoft' : 'surface'} style={styles.gapSm}>
-            <View style={styles.serviceHead}>
-              <Icon name={SERVICE_ICON[s.type]} size={18} color="primary" />
-              <Text variant="bodyStrong">{SERVICE_LABELS[s.type]}</Text>
-            </View>
-            {s.type === 'dogWalking' ? (
-              <>
-                <InfoRow label="Promenade" value={`${formatMoney(s.walkPrice ?? 0, currency)} · négociable`} />
-                <InfoRow label="Durées" value={s.walkDurationsMin?.map((d) => `${d} min`).join(', ')} />
-                <InfoRow label="Chiens en même temps" value={s.maxDogs ? String(s.maxDogs) : undefined} />
+      <View style={styles.section}>
+        <Text variant="title">Services proposés</Text>
+        {sitter.services.map((s) => {
+          const meta = SERVICE_NAMES[s.type];
+          const active = s.type === service;
+          return (
+            <Card key={s.type} tone={active ? 'primarySoft' : 'surface'} style={styles.service} testID={`service-${s.type}`}>
+              <View style={styles.serviceIcon}>
+                <Icon name={meta.icon} size={20} color="primary" />
+              </View>
+              <View style={styles.flex}>
+                <Text variant="bodyStrong">{meta.title}</Text>
                 <Text variant="caption" color="textMuted">
-                  + frais de déplacement aller-retour : {country === 'FR' ? '0,37 €' : '0,45 CHF'}/km
+                  {meta.subtitle}
                 </Text>
-              </>
-            ) : (
-              sitter.acceptedSizes.map((size) => (
-                <InfoRow
-                  key={size}
-                  labelWidth={190}
-                  label={SIZE_LABELS[size]}
-                  value={`${formatMoney(Math.max(s.dailyRates?.[size] ?? 0, MIN_DAILY_PRICE[country][size]), currency)} / jour`}
-                />
-              ))
-            )}
-          </Card>
-        ))}
+                {s.type === 'dogWalking' && (s.walkDurationsMin?.length || s.maxDogs) ? (
+                  <Text variant="caption" color="textMuted">
+                    {[s.walkDurationsMin?.map((d) => `${d} min`).join(' / '), s.maxDogs ? `${s.maxDogs} chien${s.maxDogs > 1 ? 's' : ''} max.` : null]
+                      .filter(Boolean)
+                      .join(' · ')}
+                  </Text>
+                ) : null}
+              </View>
+              {active ? <Icon name="check-circle" size={18} color="primary" /> : null}
+            </Card>
+          );
+        })}
         {!offersService && isOwner ? (
           <Text variant="caption" color="warning">
-            Ce Pet Sitter ne propose pas le service « {SERVICE_LABELS[service]} » que vous recherchez.
+            {sitter.firstName} ne propose pas « {SERVICE_LABELS[service]} », le service que vous recherchez.
           </Text>
         ) : null}
       </View>
 
-      {sitter.home && sitter.services.some((s) => s.type === 'boarding') ? (
-        <View style={styles.gapSm}>
-          <Text variant="title">My Home & Environment</Text>
-          <Card style={styles.gapSm}>
-            <InfoRow icon="home" label="Logement" value={`${sitter.home.housing === 'house' ? 'Maison' : 'Appartement'} · ${sitter.home.surfaceM2} m²`} />
-            <InfoRow icon="sun" label="Extérieur" value={[sitter.home.balcony ? 'Balcon' : null, GARDEN[sitter.home.garden]].filter(Boolean).join(' · ')} />
-            <InfoRow icon="smile" label="Enfants" value={sitter.home.children ? 'Oui' : 'Non'} />
-            <InfoRow icon="mci:paw" label="Animaux résidents" value={sitter.home.residentAnimals || 'Aucun'} />
-            <InfoRow icon="git-branch" label="Séparation possible" value={sitter.home.canSeparate ? 'Oui' : 'Non'} />
-          </Card>
+      <View style={styles.section}>
+        <Text variant="title">Animaux acceptés</Text>
+        <View style={styles.chips}>
+          {sitter.acceptedSizes.map((size) => (
+            <Chip key={size} label={SIZE_LABELS[size]} icon={size === 'cat' ? 'mci:cat' : 'mci:dog'} />
+          ))}
         </View>
-      ) : null}
+      </View>
+
+      <Card style={styles.levelCard}>
+        <Icon name={level.icon} size={24} color="primary" />
+        <View style={styles.flex}>
+          <Text variant="bodyStrong">
+            Niveau {level.name} · {level.animal}
+          </Text>
+          <Text variant="caption" color="textMuted">
+            {sitter.completedMissions} mission{sitter.completedMissions > 1 ? 's' : ''} réalisée{sitter.completedMissions > 1 ? 's' : ''}
+            {next ? ` · encore ${remaining} Paw Points avant ${next.name}` : ''}
+          </Text>
+        </View>
+      </Card>
 
       {sitter.certifications.length ? (
-        <View style={styles.gapSm}>
+        <View style={styles.section}>
           <Text variant="title">Certifications & Qualifications</Text>
           {sitter.certifications.map((c) => (
-            <View key={c.name} style={styles.serviceHead}>
+            <View key={c.name} style={styles.cert}>
               <Icon name="award" size={16} color="primary" />
               <Text variant="body" style={styles.flex}>
                 {c.name} ({c.country === 'FR' ? 'France' : 'Suisse'})
@@ -189,7 +187,7 @@ export default function SitterProfileScreen() {
       ) : null}
 
       <Text variant="caption" color="textMuted">
-        L’adresse exacte n’est communiquée qu’après confirmation et paiement de la mission.
+        Le tarif est proposé et négocié dans votre demande. L’adresse exacte n’est communiquée qu’après confirmation et paiement de la mission.
       </Text>
     </Screen>
   );
@@ -198,17 +196,31 @@ export default function SitterProfileScreen() {
 const styles = StyleSheet.create({
   hero: { alignItems: 'center', gap: spacing.sm, paddingTop: spacing.sm },
   badges: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xs, justifyContent: 'center' },
-  gap: { gap: spacing.md },
-  gapSm: { gap: spacing.sm },
-  levelRow: { flexDirection: 'row', gap: spacing.md, alignItems: 'center' },
-  levelIcon: {
-    width: 52,
-    height: 52,
-    borderRadius: radius.lg,
-    backgroundColor: colors.primarySoft,
+  section: { gap: spacing.sm },
+  factsCard: { paddingVertical: spacing.xs },
+  fact: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingVertical: spacing.md },
+  factDivider: { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.border },
+  factIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: radius.md,
+    backgroundColor: colors.brandTint,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  flex: { flex: 1 },
-  serviceHead: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  factLabel: { flex: 1 },
+  factValue: { flexShrink: 1, textAlign: 'right', maxWidth: '55%' },
+  service: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
+  serviceIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: radius.md,
+    backgroundColor: colors.brandTint,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  flex: { flex: 1, gap: spacing.xxs },
+  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
+  levelCard: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
+  cert: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
 });

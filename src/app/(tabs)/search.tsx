@@ -4,8 +4,7 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 import { SitterCard } from '@/components/sitters/SitterCard';
 import { Button, Chip, EmptyState, Screen, SegmentedTabs, Stepper, Text } from '@/components/ui';
 import type { ServiceType } from '@/domain/types';
-import { petSizes, sitterListedPrice, travelFee } from '@/features/booking/requestPricing';
-import { currencyFor } from '@/features/pricing/pricing';
+import { petSizes } from '@/features/booking/requestPricing';
 import { getCity } from '@/features/sitters/cities';
 import { datesCovered, rankSitters } from '@/features/sitters/ranking';
 import { formatDay, nextDays } from '@/lib/dates';
@@ -38,7 +37,6 @@ export default function SearchTab() {
   const chosen = pets.filter((p) => effectiveIds.includes(p.id));
   const city = owner ? getCity(owner.cityId) : undefined;
   const country = city?.country ?? 'FR';
-  const currency = currencyFor(country);
 
   // React Compiler memoizes this computation.
   const results =
@@ -149,9 +147,6 @@ export default function SearchTab() {
           sitter={r.sitter}
           distanceKm={r.distanceKm}
           boosted={r.boosted}
-          currency={currency}
-          priceCents={sitterListedPrice({ sitter: r.sitter, service, country, pets: chosen, days })}
-          extraCents={city ? travelFee({ service, country, origin: city, sitter: r.sitter, days }) : 0}
           selected={selectedSitterIds.includes(r.sitter.id)}
           onToggle={() => toggleSitter(r.sitter.id)}
           onPress={() => {
