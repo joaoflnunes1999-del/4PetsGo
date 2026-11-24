@@ -158,15 +158,17 @@ Une seule application. L'utilisateur choisit son rôle à l'inscription.
 - L'accès du Pet Sitter au profil et aux soins de l'animal est **révoqué** à l'annulation de la mission ou à la fin de la période autorisée.
 
 ### 3.10 Paw Points et niveaux 🐾
-- 5 niveaux, chacun représenté par un animal au rendu premium et réaliste :
+- 5 niveaux, chacun représenté par une **patte numérotée de 1 à 5** (visuels fournis par le fondateur le 24/11/2026, qui remplacent les animaux) :
 
-| Niveau | Animal | Paw Points (⚠️ seuils indicatifs) | Commission |
+| Niveau | Emblème | Paw Points (⚠️ seuils indicatifs) | Commission |
 |---|---|---|---|
-| Beginner | Canari | 0–199 | 5 % |
-| Explorer | Lapin | 200–599 | 4 % |
-| Advanced | Chat | 600–1 499 | 3 % |
-| Expert | Labrador | 1 500–2 999 | 2 % |
-| Master | Doberman | 3 000+ | 1 % |
+| Beginner | Patte n° 1 | 0–199 | 5 % |
+| Explorer | Patte n° 2 | 200–599 | 4 % |
+| Advanced | Patte n° 3 | 600–1 499 | 3 % |
+| Expert | Patte n° 4 | 1 500–2 999 | 2 % |
+| Master | Patte n° 5 | 3 000+ | 1 % |
+
+- **Unité Paw Points** : représentée par la pièce « paw coin » (bord terracotta, face dorée, patte).
 
 - Récompenses ⚠️ indicatives et configurables :
   - mission terminée : +30 ;
