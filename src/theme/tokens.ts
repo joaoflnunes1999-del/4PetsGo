@@ -3,56 +3,58 @@
  * Never hard-code a colour, font size, spacing or radius in a screen: import from `@/theme`.
  */
 
-/** Colours sampled from the 4PetsGo logo: forest green, leaf green and mint. */
+/**
+ * Brand palette (validated by the founder, 24/11/2026):
+ * pastel green = main colour · forest = key actions/icons/contrast · warm white = main backgrounds ·
+ * mist = secondary backgrounds & selected states · soft peach = small warm touches · charcoal = text.
+ */
 export const palette = {
-  forest900: '#01331A',
-  forest800: '#024622', // logo dark green — primary actions, headings accents
-  leaf600: '#1B8A37',
-  leaf500: '#209C40', // logo "Go" green — brand highlights
-  mint300: '#C2F8C8', // logo background
-  mint200: '#D6F9DB',
-  mint100: '#E5FAE8', // app background (green, not white)
-  mint50: '#F2FCF4',
-  // Warm highlight, used sparingly (Paw Points, ratings, "new" tags)
-  honey600: '#A86B12',
-  honey500: '#E9A23B',
-  honey100: '#FDF2DF',
-
-  // Green-tinted neutrals
-  ink: '#10291A',
-  slate: '#4D6656',
-  stone: '#8BA393',
-  line: '#C9E8D0',
+  pastel: '#B9D8C5', // couleur principale
+  pastelLight: '#DCEBE1',
+  forest: '#244C3B', // boutons importants, icônes, contraste (white text 9.7:1)
+  forestDark: '#1A3A2C',
+  warmWhite: '#F7F6F0', // fonds principaux
+  mist: '#E7EDE7', // fonds secondaires, éléments sélectionnés
+  peach: '#E9B98E', // petites touches décoratives
+  peachLight: '#FBEBDD',
+  peachText: '#8A5A33', // peach-family text on light backgrounds (5.4:1)
+  charcoal: '#343B37', // textes et titres
+  charcoalMuted: '#5E6661',
+  charcoalSubtle: '#9AA19C',
+  line: '#DFE4DE',
   white: '#FFFFFF',
+  /** Logo-only: the "Go" of the wordmark keeps its original green. */
+  logoLeaf: '#209C40',
 
   // Feedback
-  success: '#1B8A37',
-  successSoft: '#D6F5DD',
-  warning: '#A86B12',
-  warningSoft: '#FBF0DA',
-  danger: '#C2413A',
-  dangerSoft: '#F9E5E3',
+  success: '#2E7D55',
+  successSoft: '#DDEFE4',
+  warning: '#8A5A33',
+  warningSoft: '#FBEBDD',
+  danger: '#B23A33',
+  dangerSoft: '#F8E3E1',
   info: '#2F6E9E',
   infoSoft: '#E3EDF6',
 } as const;
 
 export const colors = {
-  background: palette.mint100,
+  background: palette.warmWhite,
   surface: palette.white,
-  surfaceMuted: palette.mint50,
+  surfaceMuted: palette.mist,
+  selected: palette.mist,
   border: palette.line,
-  text: palette.ink,
-  textMuted: palette.slate,
-  textSubtle: palette.stone,
+  text: palette.charcoal,
+  textMuted: palette.charcoalMuted,
+  textSubtle: palette.charcoalSubtle,
   textInverse: palette.white,
-  primary: palette.forest800,
-  primaryPressed: palette.forest900,
-  primarySoft: palette.mint300,
-  brand: palette.leaf500,
-  brandTint: palette.mint200,
-  accent: palette.honey500,
-  accentStrong: palette.honey600,
-  accentSoft: palette.honey100,
+  primary: palette.forest,
+  primaryPressed: palette.forestDark,
+  primarySoft: palette.pastel,
+  brand: palette.pastel,
+  brandTint: palette.pastelLight,
+  accent: palette.peach,
+  accentStrong: palette.peachText,
+  accentSoft: palette.peachLight,
   success: palette.success,
   successSoft: palette.successSoft,
   warning: palette.warning,
@@ -61,7 +63,7 @@ export const colors = {
   dangerSoft: palette.dangerSoft,
   info: palette.info,
   infoSoft: palette.infoSoft,
-  overlay: 'rgba(1, 26, 13, 0.95)',
+  overlay: 'rgba(20, 26, 23, 0.95)',
   photoBackdrop: palette.white,
 } as const;
 
@@ -77,26 +79,26 @@ export const spacing = {
   xxxl: 48,
 } as const;
 
-/** Marketplace-style: tight corners on controls and cards, round only for avatars/chips. */
+/** Slightly rounded components; circles are reserved for profile photos (users and pets) and chips. */
 export const radius = {
   xs: 4,
   sm: 6,
-  md: 8,
-  lg: 12,
-  xl: 20,
+  md: 10,
+  lg: 14,
+  xl: 22,
   pill: 999,
 } as const;
 
 export const fontFamily = {
   display: 'Inter_700Bold',
-  displayBold: 'Inter_800ExtraBold',
+  displayBold: 'Inter_700Bold',
   body: 'Inter_400Regular',
   bodyMedium: 'Inter_500Medium',
   bodySemiBold: 'Inter_600SemiBold',
   bodyBold: 'Inter_700Bold',
 } as const;
 
-/** Type scale — a single sans-serif family (Inter), hierarchy carried by weight and size. */
+/** Type scale — Inter only, in Regular, Medium, SemiBold and Bold. */
 export const typography = {
   displayL: { fontFamily: fontFamily.display, fontSize: 26, lineHeight: 32, letterSpacing: -0.4 },
   displayM: { fontFamily: fontFamily.display, fontSize: 22, lineHeight: 28, letterSpacing: -0.3 },
@@ -125,7 +127,9 @@ export const shadow = {
 } as const;
 
 export const layout = {
-  screenPadding: spacing.lg,
+  screenPadding: 20,
+  /** Vertical rhythm between blocks of a screen (generous spacing). */
+  sectionGap: 20,
   maxContentWidth: 560,
   galleryColumns: 3,
   galleryGap: 2,
