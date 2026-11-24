@@ -69,19 +69,25 @@ docs/                      # PRD, roadmap
 ## Décisions techniques
 
 - **Design system** : toute couleur, taille, espacement ou rayon vient de `@/theme`. Pas de valeur en dur dans les écrans.
-- **Identité visuelle** (validée le 24/11/2026, remplace les versions précédentes) : moderne, minimaliste, premium, chaleureuse et intuitive, avec la simplicité de Vinted et d'Uber, dans une palette naturelle :
-  - terracotta `#C8795B`, couleur principale et boutons d'action (`colors.action`) ;
-  - brun terre `#713F32` pour les contrastes, les éléments importants, les icônes et les liens (`colors.primary`) ;
-  - crème `#F8F3EC` pour les fonds principaux ;
-  - beige rosé `#EAD9CC` pour les fonds secondaires et les cartes (`colors.surface`) ;
-  - vert sauge `#A9B5A0` pour certains détails et les éléments sélectionnés (`colors.selected`, `colors.accent`) ;
-  - gris charbon `#34312E` pour les textes et les titres.
+- **Identité visuelle** (validée le 24/11/2026, remplace les versions précédentes) : moderne, minimaliste, premium, chaleureuse, naturelle et élégante, avec la simplicité de Vinted et d'Uber. **Le terracotta domine.** Le bleu et le sauge s'utilisent avec modération.
 
-  **Toutes les couleurs et leurs variantes** sont dans `palette` (échelles terracotta, earth, beige, sage, charcoal) dans `src/theme/tokens.ts`. Les écrans n'utilisent que les tokens sémantiques `colors.*`.
-  - Typographie Inter uniquement, en Regular, Medium, SemiBold et Bold. Coins légèrement arrondis (10 px), espacements généreux (20 px).
-  - Photos de profil parfaitement circulaires, pour les utilisateurs comme pour les animaux.
-  - Contraste : un texte blanc sur terracotta donne 3,3:1. Les libellés de boutons sont donc en Bold 16 (variante `button`). Le texte et les icônes de couleur utilisent le brun terre (7,7:1) ou `terracotta[700]` (4,9:1), jamais le terracotta 500.
-  - Le logo intégré à l'app (`logo-mark.png`, composant `Logo`) est recoloré en brun terre, avec « Go » en terracotta. L'icône de l'app et le splash gardent le logo vert d'origine, en attente d'une décision du fondateur.
+  | Couleur | Rôle | Token |
+  |---|---|---|
+  | Burnt Terracotta `#B9674E` | marque, boutons d'action, accents | `colors.action`, `colors.brand` |
+  | Clay Brown `#854B3A` | contrastes, profondeur | `colors.secondary` |
+  | Warm Ivory `#F7F2EA` | fond principal | `colors.background` |
+  | Soft Sand `#E9D8C9` | fonds secondaires, zones de contenu | `colors.surfaceMuted` |
+  | Dusty Blue `#718B9C` | filtres, sélection, certaines icônes, infos secondaires | `colors.selected*`, `colors.info` |
+  | Sage Green `#A8B09A` | éléments positifs, détails naturels | `colors.success*` |
+  | Charcoal `#35312E` | textes et titres | `colors.text` |
+  | Muted Gold `#D5AD79` | récompenses, Paw Points, petits détails | `colors.accent*` |
+
+  - **Cartes blanches** (`colors.surface`) sur fond ivoire.
+  - Toutes les variantes (échelles 50 à 700) sont dans `palette`, dans `src/theme/tokens.ts`. Les écrans n'utilisent que les tokens sémantiques `colors.*`. Aucune couleur en dur hors de `src/theme`.
+  - **Contraste** : un texte blanc sur terracotta 500 donne 4,1:1, donc les libellés de boutons sont en Bold 16 (variante `button`). Le texte et les petites icônes de couleur utilisent toujours la teinte 700 de leur famille (≥ 4,6:1).
+  - Typographie : Inter uniquement, en Regular, Medium, SemiBold et Bold (`fontFamily`, `typography`). Coins légèrement arrondis (10 px), espacements généreux (20 px), icônes simples (Feather).
+  - Photos de profil parfaitement circulaires, pour les utilisateurs comme pour les animaux. Les photos de la galerie restent carrées.
+  - Logo dans l'app : maison et patte en terracotta, « 4Pets » en Clay Brown, « Go » en terracotta. L'icône de l'app et le splash gardent le logo vert d'origine, en attente d'une décision du fondateur.
 - **Profil Pet Sitter** : d'abord l'identité et le cadre de vie (âge, logement et surface, balcon, extérieur, enfants, animaux au foyer), puis la présentation, puis les services. **Aucun tarif sur le profil ni sur les cartes de résultats** : le prix apparaît seulement dans la demande, où il est négocié.
 - **Argent en centimes entiers** (`number` en centimes), arrondi au centime à chaque étape. Devise : EUR pour la France, CHF pour la Suisse, selon le pays de l'Owner.
 - **La logique métier est pure et testée** (pricing, négociation, classement). Les écrans ne font qu'appeler ces fonctions. En phase 2, le verrouillage et les règles de négociation seront ré-implémentés **côté serveur** (fonction Postgres transactionnelle et RLS), et les fonctions TypeScript serviront à l'affichage.
