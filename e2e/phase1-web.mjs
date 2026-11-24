@@ -159,9 +159,15 @@ try {
     await page.getByText(missionId).waitFor();
     await page.getByText(/Avec Inès/).waitFor();
     await shot('missions-tab');
+    await page.getByRole('tab', { name: /Mes animaux/ }).click();
+    await id('pet-card-Pistache').waitFor();
+    await id('add-pet').waitFor();
+    await shot('pets-grid');
   });
   await step('persistence after reload', async () => {
     await page.reload();
+    await id('pet-card-Pistache').waitFor();
+    await page.getByRole('tab', { name: /Missions/ }).click();
     await page.getByText(missionId).waitFor();
   });
   await step('reset local data', async () => {
@@ -186,7 +192,7 @@ try {
     await id('sitter-submit').click();
     await page.getByText('Aucune demande pour l’instant').waitFor();
     await page.getByRole('tab', { name: /Profil/ }).click();
-    await page.getByText(/commission de 5 %/).waitFor();
+    await page.getByText(/commission de 5\s%/).waitFor();
     await shot('sitter-profile-tab');
   });
 } finally {

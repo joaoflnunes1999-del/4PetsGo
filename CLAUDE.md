@@ -35,7 +35,7 @@ EXPO_OFFLINE=1 npx expo install <pkg>   # ajouter une dépendance compatible ave
 
 - Expo SDK 58, React Native 0.88, React 19.3, Expo Router (routes typées), TypeScript strict, React Compiler activé.
 - État local : **Zustand** + `persist` (AsyncStorage). Ce stockage sera remplacé par Supabase en phase 2.
-- Polices : Fraunces (titres, côté émotionnel) + Inter (texte), via `@expo-google-fonts`.
+- Police : Inter uniquement (hiérarchie par la graisse et la taille), via `@expo-google-fonts/inter`.
 - Icônes : `@expo/vector-icons` (Feather et MaterialCommunityIcons).
 - Images : `expo-image` pour l'affichage, `expo-image-picker` pour la caméra et la photothèque.
 - Tests : Jest (`jest-expo`) pour la logique pure, dans `src/features/**/__tests__`. Le parcours E2E Playwright sur Expo Web est dans `e2e/phase1-web.mjs` (onboarding → animal → galerie → recherche → négociation → verrouillage → Pet Sitter).
@@ -69,6 +69,7 @@ docs/                      # PRD, roadmap
 ## Décisions techniques
 
 - **Design system** : toute couleur, taille, espacement ou rayon vient de `@/theme`. Pas de valeur en dur dans les écrans.
+- **Direction visuelle** (validée le 24/11/2026) : style marketplace épuré, inspiré de Vinted sans en reprendre l'identité. Fonds blancs, interface plate (séparation par des bordures fines, sans ombre), coins peu arrondis (8 px), onglets soulignés, grilles de 2 colonnes à dominante visuelle. Couleur de marque **vert aloe vera** `#5FA57F`. Les actions utilisent `#367F5C` (contraste ≥ 4,8:1 avec du texte blanc). Un ton miel `#E9A23B` est réservé aux Paw Points, aux notes et aux étiquettes « Nouveau ».
 - **Argent en centimes entiers** (`number` en centimes), arrondi au centime à chaque étape. Devise : EUR pour la France, CHF pour la Suisse, selon le pays de l'Owner.
 - **La logique métier est pure et testée** (pricing, négociation, classement). Les écrans ne font qu'appeler ces fonctions. En phase 2, le verrouillage et les règles de négociation seront ré-implémentés **côté serveur** (fonction Postgres transactionnelle et RLS), et les fonctions TypeScript serviront à l'affichage.
 - **Configuration tarifaire** dans `src/features/pricing/config.ts` : elle deviendra une table `pricing_config` en phase 2.
