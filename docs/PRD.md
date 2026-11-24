@@ -144,7 +144,7 @@ Une seule application. L'utilisateur choisit son rôle à l'inscription.
 - **Moment d'affichage** : uniquement côté Owner, **après qu'un Pet Sitter a accepté la mission et avant le paiement**. Il prend la forme d'une **petite carte, non bloquante**, qui reprend le **prix réel de la mission**.
   - *Exemple : « Avec l'Owner Club, cette garde vous coûterait 198,45 € au lieu de 220,50 €. »*
 - Avantages : **−10 % sur les services éligibles** (⚠️ financement à valider, voir section 8), support prioritaire.
-- **Skin Owner Club** : une couronne pleine en Muted Gold est affichée en permanence sur la photo de profil de l'Owner, posée sur le cercle à environ 30° dans le sens des aiguilles d'une montre (validé le 24/11/2026).
+- **Skin Owner Club** : une couronne pleine en Muted Gold est affichée en permanence sur la photo de profil de l'Owner, posée sur le cercle à environ 20° dans le sens des aiguilles d'une montre (validé le 24/11/2026).
 - **Effet pour le Pet Sitter** : les missions d'un Owner Club rapportent **×1,5 Paw Points**. Ce bonus est visible avant l'acceptation et crédité à la fin de la mission. Il ne s'applique qu'aux points de la mission.
 - Bouton **« Restaurer mes achats »** dans les réglages.
 
