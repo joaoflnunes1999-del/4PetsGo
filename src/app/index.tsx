@@ -1,9 +1,9 @@
-import { Text, View } from 'react-native';
+import { Redirect } from 'expo-router';
+
+import { useAppStore } from '@/store/useAppStore';
 
 export default function Index() {
-  return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <Text>4PetsGo</Text>
-    </View>
-  );
+  const role = useAppStore((s) => s.role);
+  if (!role) return <Redirect href="/welcome" />;
+  return <Redirect href={role === 'sitter' ? '/missions' : '/pets'} />;
 }
