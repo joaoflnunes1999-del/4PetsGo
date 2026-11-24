@@ -81,7 +81,7 @@ export default function SitterProfileScreen() {
         <View style={styles.badges}>
           <LevelBadge pawPoints={sitter.pawPoints} />
           {boosted ? <Badge label="NOUVEAU" tone="accent" icon="zap" /> : null}
-          {sitter.identityVerified ? <Badge label="IDENTITÉ VÉRIFIÉE" tone="success" icon="check" /> : null}
+          {sitter.identityVerified ? <Badge label="Identité vérifiée" tone="success" icon="check" textColor="text" sentenceCase /> : null}
         </View>
         <Rating sitter={sitter} />
       </View>

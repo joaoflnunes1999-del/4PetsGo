@@ -14,7 +14,7 @@ export function Rating({ sitter }: { sitter: SitterProfile }) {
   }
   return (
     <View style={styles.row}>
-      <Icon name="star" size={13} color="accentStrong" />
+      <Icon name="mci:star" size={15} color="accent" />
       <Text variant="caption" color="text">
         {sitter.rating.toFixed(1).replace('.', ',')}
       </Text>

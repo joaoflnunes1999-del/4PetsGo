@@ -149,6 +149,8 @@ export const typography = {
   callout: { fontFamily: fontFamily.bodyMedium, fontSize: 14, lineHeight: 20 },
   caption: { fontFamily: fontFamily.body, fontSize: 13, lineHeight: 18 },
   label: { fontFamily: fontFamily.bodySemiBold, fontSize: 12, lineHeight: 16, letterSpacing: 0.4 },
+  /** Sentence-case badges ("Expert", "Identité vérifiée"). */
+  badge: { fontFamily: fontFamily.bodySemiBold, fontSize: 12, lineHeight: 16, letterSpacing: 0 },
   number: { fontFamily: fontFamily.bodyBold, fontSize: 17, lineHeight: 22 },
   /** Button labels: bold to keep white-on-terracotta legible. */
   button: { fontFamily: fontFamily.bodyBold, fontSize: 16, lineHeight: 22, letterSpacing: 0.1 },

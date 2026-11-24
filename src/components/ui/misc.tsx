@@ -73,12 +73,29 @@ const badgeTone: Record<BadgeTone, { bg: string; fg: keyof typeof colors }> = {
   muted: { bg: colors.surfaceMuted, fg: 'textMuted' },
 };
 
-export function Badge({ label, tone = 'primary', icon }: { label: string; tone?: BadgeTone; icon?: IconName }) {
+/**
+ * Status tag. `textColor` overrides the tone's text/icon colour (e.g. charcoal on a sage tag);
+ * `sentenceCase` uses the non-spaced badge style for labels like "Identité vérifiée".
+ */
+export function Badge({
+  label,
+  tone = 'primary',
+  icon,
+  textColor,
+  sentenceCase,
+}: {
+  label: string;
+  tone?: BadgeTone;
+  icon?: IconName;
+  textColor?: keyof typeof colors;
+  sentenceCase?: boolean;
+}) {
   const t = badgeTone[tone];
+  const fg = textColor ?? t.fg;
   return (
     <View style={[styles.badge, { backgroundColor: t.bg }]}>
-      {icon ? <Icon name={icon} size={12} color={t.fg} /> : null}
-      <Text variant="label" color={t.fg}>
+      {icon ? <Icon name={icon} size={12} color={fg} /> : null}
+      <Text variant={sentenceCase ? 'badge' : 'label'} color={fg}>
         {label}
       </Text>
     </View>
