@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useSyncExternalStore } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
@@ -216,11 +216,9 @@ export function findSitter(id: string, mySitter?: SitterProfile): SitterProfile 
 
 /** True once persisted state has been rehydrated (avoids flashing the onboarding). */
 export function useHydrated(): boolean {
-  const [hydrated, setHydrated] = useState(() => useAppStore.persist.hasHydrated());
-  useEffect(() => {
-    const unsub = useAppStore.persist.onFinishHydration(() => setHydrated(true));
-    setHydrated(useAppStore.persist.hasHydrated());
-    return unsub;
-  }, []);
-  return hydrated;
+  return useSyncExternalStore(
+    (cb) => useAppStore.persist.onFinishHydration(cb),
+    () => useAppStore.persist.hasHydrated(),
+    () => false,
+  );
 }
