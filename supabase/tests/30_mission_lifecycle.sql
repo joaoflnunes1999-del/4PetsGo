@@ -125,7 +125,78 @@ begin
   assert (select refund_cents from public.missions where id = v_mission) = 6000, 'owner refunded 3 days';
   assert (select amount_cents from public.wallet_entries where mission_id = v_mission) = 2000 - 100;
   assert (select paw_points from public.sitter_profiles where id = '00000000-0000-0000-0000-0000000000c2') = 0, 'no points when the sitter withdraws';
-  raise notice 'early end (sitter withdraws): owner pays only the days done, rest refunded, no Paw Points';
+  assert (select owner_fee_refund_cents from public.missions where id = v_mission) = 400, 'owner 5 % fee refunded in full';
+  raise notice 'early end (sitter withdraws): owner pays only the days done, rest refunded, 5 %% fee refunded in full, no Paw Points';
+end $$;
+
+-- Cancellation before the drop-off.
+create or replace function pg_temp.new_confirmed_mission(p_sitter text, p_start date, p_price integer) returns uuid language plpgsql as $$
+declare v_req text; v_mission uuid;
+begin
+  perform pg_temp.act('00000000-0000-0000-0000-0000000000a1'); set local role authenticated;
+  v_req := public.create_booking_request(array['00000000-0000-0000-0000-00000000f001']::uuid[], 'boarding', p_start, 2,
+    array[p_sitter]::uuid[], p_price);
+  reset role; perform pg_temp.act(p_sitter); set local role authenticated;
+  perform public.respond_to_offer(v_req, p_sitter::uuid, 'accept');
+  select id into v_mission from public.missions where request_id = v_req;
+  reset role; perform pg_temp.act('00000000-0000-0000-0000-0000000000a1'); set local role authenticated;
+  perform public.confirm_mission(v_mission);
+  reset role;
+  return v_mission;
+end $$;
+
+do $$ begin
+  assert private.cancellation_refund_rate(15 * 24) = 1.0 and private.cancellation_refund_rate(14 * 24) = 0.75
+     and private.cancellation_refund_rate(72) = 0.75 and private.cancellation_refund_rate(71) = 0.5
+     and private.cancellation_refund_rate(24) = 0.5 and private.cancellation_refund_rate(23) = 0, 'brackets';
+  raise notice 'cancellation brackets: >14 d 100 %%, 3–14 d 75 %%, 24–72 h 50 %%, <24 h 0 %%';
+end $$;
+
+do $$
+declare v_m uuid;
+begin
+  -- Owner cancels 20 days ahead → everything refunded, nothing retained.
+  v_m := pg_temp.new_confirmed_mission('00000000-0000-0000-0000-0000000000c1', current_date + 20, 6000);
+  perform pg_temp.act('00000000-0000-0000-0000-0000000000a1'); set local role authenticated;
+  perform public.cancel_mission(v_m, 'Changement de programme');
+  reset role;
+  assert (select refund_cents from public.missions where id = v_m) = 6000 and (select cancellation_fee_cents from public.missions where id = v_m) = 0;
+
+  -- Owner cancels 7 days ahead → 75 % refunded, 25 % retained for the sitter (minus commission).
+  v_m := pg_temp.new_confirmed_mission('00000000-0000-0000-0000-0000000000c1', current_date + 7, 8000);
+  perform pg_temp.act('00000000-0000-0000-0000-0000000000a1'); set local role authenticated;
+  perform public.cancel_mission(v_m, 'Voyage annulé');
+  reset role;
+  assert (select refund_cents from public.missions where id = v_m) = 6000, '75 % refunded';
+  assert (select cancellation_fee_cents from public.missions where id = v_m) = 2000, '25 % retained';
+  assert (select status from public.wallet_entries where mission_id = v_m) = 'available';
+  raise notice 'owner cancellation: refund by time left, retained fee credited to the sitter';
+
+  -- Compassion: the sitter waives the fee → the owner gets everything back.
+  perform pg_temp.act('00000000-0000-0000-0000-0000000000a1'); set local role authenticated;
+  begin perform public.waive_cancellation_fee(v_m); raise exception 'expected FORBIDDEN';
+  exception when others then assert sqlerrm = 'FORBIDDEN', sqlerrm; end;
+  reset role; perform pg_temp.act('00000000-0000-0000-0000-0000000000c1'); set local role authenticated;
+  perform public.waive_cancellation_fee(v_m);
+  reset role;
+  assert (select refund_cents from public.missions where id = v_m) = 8000 and (select cancellation_fee_waived from public.missions where id = v_m);
+  assert (select status from public.wallet_entries where mission_id = v_m) = 'cancelled';
+  raise notice 'compassion: only the sitter can waive the cancellation fee; owner refunded 100 %%';
+
+  -- Owner cancels on the start day (< 24 h) → nothing refunded.
+  v_m := pg_temp.new_confirmed_mission('00000000-0000-0000-0000-0000000000c1', current_date, 5000);
+  perform pg_temp.act('00000000-0000-0000-0000-0000000000a1'); set local role authenticated;
+  perform public.cancel_mission(v_m, 'Oubli');
+  reset role;
+  assert (select refund_cents from public.missions where id = v_m) = 0, '< 24 h: no refund';
+
+  -- Sitter cancels (even last minute) → owner refunded 100 %, fee included.
+  v_m := pg_temp.new_confirmed_mission('00000000-0000-0000-0000-0000000000c2', current_date, 5000);
+  perform pg_temp.act('00000000-0000-0000-0000-0000000000c2'); set local role authenticated;
+  perform public.cancel_mission(v_m, 'Urgence familiale');
+  reset role;
+  assert (select refund_cents from public.missions where id = v_m) = 5000 and (select owner_fee_refund_cents from public.missions where id = v_m) = 250;
+  raise notice 'sitter cancellation: owner refunded 100 %% including the 5 %% fee';
 end $$;
 
 drop table public._m;
