@@ -56,7 +56,7 @@ try {
     await id('pet-name').fill('Pistache');
     if (!(await id('pet-create').isDisabled())) throw new Error('a dog cannot be created without its weight');
     await id('pet-weight').fill('28');
-    await page.getByText(/Catégorie : Grand chien \(25–40 kg\)/).waitFor();
+    if (await page.getByText(/tarif|Catégorie/).count()) throw new Error('the weight field must not mention pricing');
     await id('pet-create').click();
     await page.getByText('Le profil de Pistache est prêt').waitFor();
     await shot('pet-profile-created');
@@ -98,7 +98,8 @@ try {
     await id('edit-bio').fill('Golden au grand cœur, fan de balles de tennis.');
     if (await page.getByRole('tab', { name: 'Confidentialité' }).count()) throw new Error('privacy tab must be gone');
     await id('pet-save').click();
-    await page.getByText('Golden au grand cœur').waitFor();
+    await id('edit-bio').waitFor({ state: 'detached' }); // edit screen fully closed
+    await page.getByText('Golden au grand cœur').first().waitFor();
     await page.getByText(/Photos visibles par les membres de 4PetsGo/).waitFor();
     await page.getByRole('tab', { name: 'Soins' }).click();
     await page.getByText('Informations sensibles').waitFor();
