@@ -7,7 +7,6 @@ import { Button, Card, Chip, Icon, Input, Screen, SegmentedTabs, Text } from '@/
 import type { Sex, Species } from '@/domain/types';
 import { parseFrenchDate } from '@/features/pets/age';
 import { getBreed, searchBreeds } from '@/features/pets/breeds';
-import { SIZE_LABELS, sizeCategoryFor } from '@/features/pricing/pricing';
 import { useAppStore } from '@/store/useAppStore';
 import { colors, radius, spacing } from '@/theme';
 
@@ -36,7 +35,7 @@ export default function NewPet() {
     weight: weight && (!Number.isFinite(weightKg) || weightKg! <= 0 || weightKg! > 120) ? 'Poids invalide' : undefined,
     estimate: estimate && (!Number.isFinite(estimateYears) || estimateYears! < 0 || estimateYears! > 30) ? 'Âge invalide' : undefined,
   };
-  // A dog's weight is mandatory: it sets the size category, hence the minimum price.
+  // A dog's weight is mandatory (it drives the minimum price — never explained to owners, to avoid under-declaring).
   const weightMissing = species === 'dog' && !weight.trim();
   const valid = name.trim().length >= 1 && !!breedId && !weightMissing && !errors.birth && !errors.weight && !errors.estimate;
 
@@ -178,13 +177,6 @@ export default function NewPet() {
         keyboardType="decimal-pad"
         suffix="kg"
         error={errors.weight}
-        helper={
-          species === 'dog'
-            ? weightKg && !errors.weight
-              ? `Catégorie : ${SIZE_LABELS[sizeCategoryFor('dog', weightKg)]}. Sert à calculer le tarif minimum.`
-              : 'Indispensable pour calculer le tarif minimum de garde.'
-            : undefined
-        }
         testID="pet-weight"
       />
     </Screen>
