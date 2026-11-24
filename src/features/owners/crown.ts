@@ -1,8 +1,8 @@
 /**
  * Owner Club "skin": a crown sitting on the rim of the circular profile photo.
- * Angle is measured clockwise from 12 o'clock (founder: ≈ 15°); the crown is tilted by the same angle.
+ * Angle is measured clockwise from 12 o'clock (founder: ≈ 30°); the crown is tilted by the same angle.
  */
-export const OWNER_CLUB_CROWN_ANGLE_DEG = 15;
+export const OWNER_CLUB_CROWN_ANGLE_DEG = 30;
 
 export function crownPlacement(avatarSize: number, angleDeg = OWNER_CLUB_CROWN_ANGLE_DEG) {
   const r = avatarSize / 2;

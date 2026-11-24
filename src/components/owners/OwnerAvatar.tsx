@@ -10,7 +10,7 @@ type Props = { owner: Pick<OwnerProfile, 'firstName' | 'ownerClub'> & { photoUri
 
 /**
  * Circular owner photo (initials until a photo exists). Owner Club members unlock a permanent skin:
- * a filled Muted Gold crown on the rim, ≈ 15° clockwise from the top.
+ * a filled Muted Gold crown on the rim, ≈ 30° clockwise from the top.
  */
 export function OwnerAvatar({ owner, size }: Props) {
   const crown = owner.ownerClub ? crownPlacement(size) : undefined;
