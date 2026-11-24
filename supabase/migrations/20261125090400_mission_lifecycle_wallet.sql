@@ -40,15 +40,22 @@ create table public.mission_events (
 );
 create index mission_events_mission_idx on public.mission_events (mission_id, id);
 
+-- Chat messages are IMMUTABLE (founder rule 25/11/2026): neither party can edit or delete a sent message.
+-- They are kept as the record of the mission (disputes, cancellations). A deleted account only loses its
+-- identity on its messages (sender_id set to null), the content stays for the other party.
 create table public.messages (
   id uuid primary key default gen_random_uuid(),
   mission_id uuid not null references public.missions (id) on delete cascade,
-  sender_id uuid not null references public.profiles (id) on delete cascade,
+  sender_id uuid references public.profiles (id) on delete set null,
   body text check (char_length(body) <= 2000),
-  -- `mission-photos` bucket: {mission_id}/{uuid}.jpg (sensitive: mission parties only)
-  photo_path text,
+  -- Attachment in the `mission-files` bucket: {mission_id}/{uuid}-{file name} (sensitive: mission parties only)
+  attachment_path text,
+  attachment_name text check (char_length(attachment_name) <= 200),
+  attachment_mime text,
+  attachment_size integer check (attachment_size between 1 and 20971520),
   created_at timestamptz not null default now(),
-  check (body is not null or photo_path is not null)
+  check (body is not null or attachment_path is not null),
+  check ((attachment_path is null) = (attachment_name is null) and (attachment_path is null) = (attachment_mime is null))
 );
 create index messages_mission_idx on public.messages (mission_id, created_at);
 
@@ -158,6 +165,8 @@ create policy messages_read on public.messages for select to authenticated
 create policy messages_insert on public.messages for insert to authenticated
   with check (
     sender_id = (select auth.uid())
+    -- an attachment must live in this mission's folder
+    and (attachment_path is null or (storage.foldername(attachment_path))[1] = mission_id::text)
     and exists (
       select 1 from public.missions m
       where m.id = mission_id and (select auth.uid()) in (m.owner_id, m.sitter_id) and m.status in ('confirmed', 'in_progress')
@@ -168,13 +177,36 @@ create policy wallet_entries_read_own on public.wallet_entries for select to aut
 create policy payouts_read_own on public.payouts for select to authenticated using (sitter_id = (select auth.uid()));
 create policy paw_points_ledger_read_own on public.paw_points_ledger for select to authenticated using (sitter_id = (select auth.uid()));
 
--- Mission photos: sensitive, mission parties only, while the mission is active (read stays for the parties).
-insert into storage.buckets (id, name, public) values ('mission-photos', 'mission-photos', false) on conflict (id) do nothing;
-create policy mission_photos_objects_read on storage.objects for select to authenticated
-  using (bucket_id = 'mission-photos' and (select private.is_mission_party(((storage.foldername(name))[1])::uuid)));
-create policy mission_photos_objects_write on storage.objects for insert to authenticated
+-- No UPDATE / DELETE policy on messages: RLS already forbids it; the trigger below also blocks
+-- SECURITY DEFINER code paths. Only the server (account deletion cascade, legal retention jobs) may.
+create or replace function private.messages_are_immutable()
+returns trigger
+language plpgsql
+set search_path = ''
+as $$
+begin
+  if private.is_server() then
+    return coalesce(new, old);
+  end if;
+  raise exception 'MESSAGES_ARE_IMMUTABLE';
+end;
+$$;
+create trigger messages_immutable
+  before update or delete on public.messages
+  for each row execute function private.messages_are_immutable();
+
+-- Mission files (photos, PDFs, documents): sensitive, mission parties only. Upload while the mission is active;
+-- readable afterwards by the parties. No update/delete policy: files sent in the chat cannot be removed either.
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types) values (
+  'mission-files', 'mission-files', false, 20971520,
+  array['image/jpeg', 'image/png', 'image/heic', 'image/webp', 'application/pdf',
+        'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain']
+) on conflict (id) do nothing;
+create policy mission_files_objects_read on storage.objects for select to authenticated
+  using (bucket_id = 'mission-files' and (select private.is_mission_party(((storage.foldername(name))[1])::uuid)));
+create policy mission_files_objects_write on storage.objects for insert to authenticated
   with check (
-    bucket_id = 'mission-photos'
+    bucket_id = 'mission-files'
     and exists (
       select 1 from public.missions m
       where m.id = ((storage.foldername(name))[1])::uuid

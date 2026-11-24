@@ -152,7 +152,7 @@ stable
 set search_path = ''
 as $$
   select current_user in ('postgres', 'service_role', 'supabase_admin')
-    or coalesce(current_setting('request.jwt.claims', true)::jsonb ->> 'role', '') = 'service_role';
+    or coalesce(nullif(current_setting('request.jwt.claims', true), '')::jsonb ->> 'role', '') = 'service_role';
 $$;
 
 -- Weight first; without a weight, the breed's typical size; then dogMedium (mirrors pricing.ts sizeCategoryFor).
