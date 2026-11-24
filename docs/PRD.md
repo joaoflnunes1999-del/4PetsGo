@@ -97,7 +97,7 @@ Une seule application. L'utilisateur choisit son rôle à l'inscription.
 2. Chaque demande possède un **identifiant de mission unique**.
 3. Chaque Pet Sitter peut **accepter**, **refuser** ou faire une **contre-offre**.
 4. **Négociation** : jusqu'à **3 allers-retours** par Pet Sitter. Chaque offre **expire au bout de 48 h** sans réponse. L'historique des offres reste visible.
-5. Une offre ne peut **jamais descendre sous le prix minimum** du service (voir 3.6). Ce minimum vaut, pour chaque animal, le tarif de son gabarit (selon son poids, ou selon sa race si le poids n'est pas renseigné), multiplié par le nombre de jours. Cette règle s'applique à la proposition initiale de l'Owner comme à chaque contre-proposition, dans l'app et sur le serveur.
+5. Une offre ne peut **jamais descendre sous le prix minimum** du service (voir 3.6). Ce minimum vaut, pour chaque animal, le tarif de son gabarit (selon son poids, **obligatoire pour un chien**), multiplié par le nombre de jours. Cette règle s'applique à la proposition initiale de l'Owner comme à chaque contre-proposition, dans l'app et sur le serveur.
 6. **Verrouillage** : dès qu'un accord est conclu entre l'Owner et un Pet Sitter, la mission est verrouillée **de façon atomique côté serveur**. Toutes les autres offres sont automatiquement clôturées, et aucun autre Pet Sitter ne peut plus accepter.
 7. L'Owner voit le récapitulatif du prix → **carte Owner Club** (paywall, voir 3.8) → paiement → **mission confirmée**.
 
@@ -228,7 +228,7 @@ Une seule application. L'utilisateur choisit son rôle à l'inscription.
         │
 5. Création du 1er animal
    espèce → race (recherche) → photo de race affichée automatiquement
-   → nom, date de naissance, sexe, poids
+   → nom, date de naissance, sexe, poids (obligatoire pour un chien)
         │
 6. Profil de l'animal créé 🎉  (galerie vide, invitation à ajouter des photos)
    [compléter personnalité / routine / soins : possible maintenant ou plus tard]
