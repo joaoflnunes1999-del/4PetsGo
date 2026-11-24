@@ -1,8 +1,10 @@
 import { router } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Button, Icon, Screen, Text, type IconName } from '@/components/ui';
-import { colors, radius, spacing } from '@/theme';
+import { Button, Icon, Text, type IconName } from '@/components/ui';
+import { colors, layout, radius, spacing } from '@/theme';
 
 const PILLARS: { icon: IconName; title: string; body: string }[] = [
   { icon: 'mci:paw', title: 'Un profil pour chaque animal', body: 'Photos, habitudes et soins réunis au même endroit, partagés uniquement avec son Pet Sitter.' },
@@ -11,21 +13,22 @@ const PILLARS: { icon: IconName; title: string; body: string }[] = [
 ];
 
 export default function Welcome() {
+  const insets = useSafeAreaInsets();
   return (
-    <Screen
-      footer={<Button label="Commencer" onPress={() => router.push('/onboarding/role')} testID="welcome-start" />}>
-      <View style={styles.hero}>
+    <View style={styles.root}>
+      <StatusBar style="light" />
+      <View style={[styles.hero, { paddingTop: insets.top + spacing.xxxl }]}>
         <View style={styles.logo}>
-          <Icon name="mci:paw" size={34} color="textInverse" />
+          <Icon name="mci:paw" size={30} color="primary" />
         </View>
-        <Text variant="displayL" align="center">
+        <Text variant="displayL" color="textInverse" align="center" style={styles.brand}>
           4PetsGo
         </Text>
-        <Text variant="title" color="textMuted" align="center">
+        <Text variant="title" color="textInverse" align="center">
           Your Pet, their care, one place!
         </Text>
       </View>
-      <View style={styles.pillars}>
+      <View style={styles.body}>
         {PILLARS.map((p) => (
           <View key={p.title} style={styles.pillar}>
             <View style={styles.pillarIcon}>
@@ -40,30 +43,50 @@ export default function Welcome() {
           </View>
         ))}
       </View>
-    </Screen>
+      <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, spacing.lg) }]}>
+        <Button label="Commencer" onPress={() => router.push('/onboarding/role')} testID="welcome-start" />
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  hero: { alignItems: 'center', gap: spacing.sm, paddingTop: spacing.xxxl, paddingBottom: spacing.xl },
-  logo: {
-    width: 76,
-    height: 76,
-    borderRadius: radius.xl,
+  root: { flex: 1, backgroundColor: colors.background },
+  hero: {
     backgroundColor: colors.primary,
+    alignItems: 'center',
+    gap: spacing.sm,
+    paddingBottom: spacing.xxl,
+    paddingHorizontal: layout.screenPadding,
+  },
+  logo: {
+    width: 64,
+    height: 64,
+    borderRadius: radius.lg,
+    backgroundColor: colors.surface,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: spacing.sm,
   },
-  pillars: { gap: spacing.xl },
+  brand: { fontSize: 34, lineHeight: 40 },
+  body: {
+    flex: 1,
+    gap: spacing.xl,
+    paddingHorizontal: layout.screenPadding,
+    paddingTop: spacing.xxl,
+    width: '100%',
+    maxWidth: layout.maxContentWidth,
+    alignSelf: 'center',
+  },
   pillar: { flexDirection: 'row', gap: spacing.lg, alignItems: 'flex-start' },
   pillarIcon: {
-    width: 44,
-    height: 44,
+    width: 40,
+    height: 40,
     borderRadius: radius.md,
     backgroundColor: colors.primarySoft,
     alignItems: 'center',
     justifyContent: 'center',
   },
   pillarText: { flex: 1, gap: spacing.xxs },
+  footer: { paddingHorizontal: layout.screenPadding, paddingTop: spacing.md, width: '100%', maxWidth: layout.maxContentWidth, alignSelf: 'center' },
 });
