@@ -179,6 +179,14 @@ try {
     await page.getByRole('tab', { name: /Missions/ }).click();
     await page.getByText(missionId).waitFor();
   });
+  await step('Owner Club skin: crown on the owner avatar (demo toggle)', async () => {
+    await page.getByRole('tab', { name: /Profil/ }).click();
+    if (await id('owner-club-crown').count()) throw new Error('crown must be hidden without Owner Club');
+    await id('demo-owner-club').click();
+    await id('owner-club-crown').waitFor();
+    await page.getByText('Membre Owner Club').waitFor();
+    await shot('owner-club-crown');
+  });
   await step('reset local data', async () => {
     await page.getByRole('tab', { name: /Profil/ }).click();
     await id('reset').click();
