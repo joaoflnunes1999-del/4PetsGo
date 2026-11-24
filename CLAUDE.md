@@ -69,7 +69,15 @@ docs/                      # PRD, roadmap
 ## Décisions techniques
 
 - **Design system** : toute couleur, taille, espacement ou rayon vient de `@/theme`. Pas de valeur en dur dans les écrans.
-- **Direction visuelle** (validée le 24/11/2026, mise à jour avec le logo) : style marketplace épuré, inspiré de Vinted sans en reprendre l'identité. Interface plate (bordures fines, sans ombre), coins peu arrondis (8 px), onglets soulignés, grilles de 2 colonnes. **Couleurs extraites du logo** : fond menthe clair `#E5FAE8` (jamais de fond blanc pour l'écran, le blanc est réservé aux cartes), vert forêt `#024622` pour les actions et le texte de marque, vert feuille `#209C40` pour les accents, menthe `#C2F8C8` pour les états sélectionnés. Un ton miel est réservé aux Paw Points, aux notes et aux étiquettes « Nouveau ». Le logo se trouve dans `assets/images/` (icône, splash, `logo-mark.png`) et passe par le composant `Logo`.
+- **Identité visuelle** (validée le 24/11/2026, remplace les versions précédentes) : moderne, minimaliste, premium, chaleureuse et intuitive, avec la simplicité de Vinted et d'Uber. Palette :
+  - vert pastel `#B9D8C5`, couleur principale (bandeaux, badges, anneaux d'avatar) ;
+  - vert forêt `#244C3B` pour les boutons importants, les icônes et les éléments de contraste ;
+  - blanc chaud `#F7F6F0` pour les fonds principaux (cartes en blanc) ;
+  - vert brume `#E7EDE7` pour les fonds secondaires et les éléments sélectionnés ;
+  - pêche doux `#E9B98E` pour les petites touches décoratives (Paw Points, « Nouveau »), décliné en `#8A5A33` pour le texte ;
+  - gris charbon `#343B37` pour les textes et les titres.
+
+  Typographie **Inter uniquement**, en Regular, Medium, SemiBold et Bold. Coins légèrement arrondis (10 px), espacements généreux (20 px), icônes simples. **Toutes les photos de profil sont parfaitement circulaires**, pour les utilisateurs comme pour les animaux (les photos de la galerie restent carrées). Le logo garde ses couleurs d'origine (`palette.logoLeaf` pour « Go »).
 - **Profil Pet Sitter** : d'abord l'identité et le cadre de vie (âge, logement et surface, balcon, extérieur, enfants, animaux au foyer), puis la présentation, puis les services. **Aucun tarif sur le profil ni sur les cartes de résultats** : le prix apparaît seulement dans la demande, où il est négocié.
 - **Argent en centimes entiers** (`number` en centimes), arrondi au centime à chaque étape. Devise : EUR pour la France, CHF pour la Suisse, selon le pays de l'Owner.
 - **La logique métier est pure et testée** (pricing, négociation, classement). Les écrans ne font qu'appeler ces fonctions. En phase 2, le verrouillage et les règles de négociation seront ré-implémentés **côté serveur** (fonction Postgres transactionnelle et RLS), et les fonctions TypeScript serviront à l'affichage.
