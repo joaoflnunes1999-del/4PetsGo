@@ -8,3 +8,5 @@ export { Screen } from './Screen';
 export { SegmentedTabs } from './SegmentedTabs';
 export { Stepper } from './Stepper';
 export { Text } from './Text';
+export { ActionSheet, Sheet, type SheetAction } from './Sheet';
+export { ConfirmSheet } from './ConfirmSheet';

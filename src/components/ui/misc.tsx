@@ -21,11 +21,21 @@ export function Divider() {
   return <View style={styles.divider} />;
 }
 
-export function InfoRow({ icon, label, value }: { icon?: IconName; label: string; value?: string | null }) {
+export function InfoRow({
+  icon,
+  label,
+  value,
+  labelWidth = 130,
+}: {
+  icon?: IconName;
+  label: string;
+  value?: string | null;
+  labelWidth?: number;
+}) {
   return (
     <View style={styles.infoRow}>
       {icon ? <Icon name={icon} size={18} color="textMuted" /> : null}
-      <Text variant="callout" color="textMuted" style={styles.infoLabel}>
+      <Text variant="callout" color="textMuted" style={{ width: labelWidth }}>
         {label}
       </Text>
       <Text variant="callout" style={styles.infoValue}>
@@ -80,7 +90,6 @@ const styles = StyleSheet.create({
   sectionRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   divider: { height: StyleSheet.hairlineWidth, backgroundColor: colors.border },
   infoRow: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.sm, paddingVertical: spacing.xs },
-  infoLabel: { width: 130 },
   infoValue: { flex: 1 },
   empty: { alignItems: 'center', gap: spacing.md, paddingVertical: spacing.xxl, paddingHorizontal: spacing.lg },
   emptyIcon: {
