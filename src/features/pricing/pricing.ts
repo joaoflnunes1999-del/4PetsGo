@@ -34,9 +34,13 @@ export function currencyFor(country: Country): Currency {
   return CURRENCY_BY_COUNTRY[country];
 }
 
-export function sizeCategoryFor(species: Species, weightKg?: number): SizeCategory {
+/**
+ * Size category used by the minimum-price grid: weight first; without a weight, the breed's typical size
+ * (`breedFallback`), and only then "dogMedium".
+ */
+export function sizeCategoryFor(species: Species, weightKg?: number, breedFallback?: SizeCategory): SizeCategory {
   if (species === 'cat') return 'cat';
-  if (weightKg == null || Number.isNaN(weightKg)) return 'dogMedium';
+  if (weightKg == null || Number.isNaN(weightKg)) return breedFallback && breedFallback !== 'cat' ? breedFallback : 'dogMedium';
   if (weightKg < DOG_SIZE_THRESHOLDS_KG.small) return 'dogSmall';
   if (weightKg < DOG_SIZE_THRESHOLDS_KG.medium) return 'dogMedium';
   if (weightKg < DOG_SIZE_THRESHOLDS_KG.large) return 'dogLarge';

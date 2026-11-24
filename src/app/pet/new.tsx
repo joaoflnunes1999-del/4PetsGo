@@ -47,7 +47,6 @@ export default function NewPet() {
       estimatedAgeYears: ageMode === 'estimate' ? estimateYears : undefined,
       sex,
       weightKg,
-      photoVisibility: 'confirmedBookings',
       personality: { traits: [] },
       routine: {},
       care: { medications: [] },
@@ -179,7 +178,7 @@ export default function NewPet() {
         error={errors.weight}
         helper={
           species === 'dog'
-            ? `Sert à calculer le tarif. ${weightKg && !errors.weight ? `Catégorie : ${SIZE_LABELS[sizeCategoryFor('dog', weightKg)]}` : ''}`
+            ? `Sert à calculer le tarif minimum. Catégorie : ${SIZE_LABELS[sizeCategoryFor('dog', errors.weight ? undefined : weightKg, getBreed(breedId!).typicalSize)]}${weightKg && !errors.weight ? '' : ' (selon la race)'}`
             : undefined
         }
         testID="pet-weight"

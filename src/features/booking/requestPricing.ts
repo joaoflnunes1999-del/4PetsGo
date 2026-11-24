@@ -1,11 +1,13 @@
 import type { BookingRequest, Country, GeoPoint, PetProfile, ServiceType, SitterProfile } from '@/domain/types';
 import { levelFor } from '@/features/levels/levels';
 import { kmFeeCents, listedPriceCents, minimumPriceCents, quote, sizeCategoryFor, type Quote } from '@/features/pricing/pricing';
+import { getBreed } from '@/features/pets/breeds';
 import { distanceKm } from '@/features/sitters/geo';
 
 /** Glue between profiles and the pure pricing engine, used by search, request and negotiation screens. */
+/** Size of each pet: weight, else breed typical size (PRD: minimum = size grid × days). */
 export function petSizes(pets: PetProfile[]) {
-  return pets.map((p) => sizeCategoryFor(p.species, p.weightKg));
+  return pets.map((p) => sizeCategoryFor(p.species, p.weightKg, getBreed(p.breedId).typicalSize));
 }
 
 export function floorFor(args: { service: ServiceType; country: Country; pets: PetProfile[]; days: number }) {

@@ -19,6 +19,11 @@ describe('sizeCategoryFor', () => {
     expect(sizeCategoryFor('dog', 40)).toBe('dogXL');
     expect(sizeCategoryFor('dog')).toBe('dogMedium');
   });
+
+  it('falls back to the breed typical size when the weight is unknown', () => {
+    expect(sizeCategoryFor('dog', undefined, 'dogXL')).toBe('dogXL');
+    expect(sizeCategoryFor('dog', 8, 'dogXL')).toBe('dogSmall'); // weight wins
+  });
 });
 
 describe('minimum prices', () => {
