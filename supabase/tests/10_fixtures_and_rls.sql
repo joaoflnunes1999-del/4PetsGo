@@ -41,21 +41,25 @@ begin;
 set local role authenticated;
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000b2","role":"authenticated"}', true);
 do $$ begin
-  assert (select count(*) from public.pets) = 0, 'other owner cannot see pet';
+  assert (select count(*) from public.pets) = 1, 'pet profiles are public inside the app';
+  assert (select count(*) from public.pet_photos) = 1, 'pet gallery is public inside the app';
   assert (select count(*) from public.pet_care) = 0, 'other owner cannot see care';
-  assert (select count(*) from public.pet_photos) = 0, 'other owner cannot see confirmedBookings photos';
   update public.pets set name = 'Hacked' where id = '00000000-0000-0000-0000-00000000f001';
-  raise notice 'other owner: no access to someone else''s pet, care or photos';
+  delete from public.pet_photos;
+  raise notice 'other user: sees the public pet profile and gallery, never its care data, cannot modify or delete';
 end $$;
 commit;
-do $$ begin assert (select name from public.pets where id = '00000000-0000-0000-0000-00000000f001') = 'Pistache', 'pet not modified by other owner'; end $$;
+do $$ begin
+  assert (select name from public.pets where id = '00000000-0000-0000-0000-00000000f001') = 'Pistache', 'pet not modified by other owner';
+  assert (select count(*) from public.pet_photos) = 1, 'photo not deleted by other owner';
+end $$;
 
 -- ---- Camille (sitter) before any request --------------------------------------
 begin;
 set local role authenticated;
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000c1","role":"authenticated"}', true);
 do $$ begin
-  assert (select count(*) from public.pets) = 0, 'sitter cannot see pets without a request';
+  assert (select count(*) from public.pet_care) = 0, 'sitter cannot see care without a mission';
   update public.sitter_profiles set paw_points = 9999, identity_verified = true where id = auth.uid();
   assert (select paw_points from public.sitter_profiles where id = auth.uid()) = 0, 'sitter cannot edit paw points';
   assert (select identity_verified from public.sitter_profiles where id = auth.uid()) = false, 'sitter cannot self-verify';
@@ -71,7 +75,7 @@ do $$ begin
     raise exception 'expected RLS violation';
   exception when insufficient_privilege then null;
   end;
-  raise notice 'sitter: no pet access without request, reputation fields and floor protected, no direct booking writes';
+  raise notice 'sitter: no care access without mission, reputation fields and floor protected, no direct booking writes';
 end $$;
 commit;
 

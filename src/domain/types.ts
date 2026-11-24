@@ -11,8 +11,6 @@ export type SizeCategory = 'cat' | 'dogSmall' | 'dogMedium' | 'dogLarge' | 'dogX
 
 export type ServiceType = 'boarding' | 'homeVisits' | 'dogWalking';
 
-export type PhotoVisibility = 'public' | 'confirmedBookings' | 'private';
-
 export type LevelId = 'beginner' | 'explorer' | 'advanced' | 'expert' | 'master';
 
 export type GeoPoint = { lat: number; lng: number };
@@ -41,7 +39,6 @@ export type PetProfile = {
   bio?: string;
   /** Photo id from the gallery; undefined = breed library image. */
   mainPhotoId?: string;
-  photoVisibility: PhotoVisibility;
   personality: {
     traits: string[];
     energy?: 'low' | 'medium' | 'high';

@@ -20,7 +20,7 @@ import {
 import type { PetProfile } from '@/domain/types';
 import { formatAge, isoToFrench } from '@/features/pets/age';
 import { getBreed } from '@/features/pets/breeds';
-import { ENERGY, VISIBILITY } from '@/features/pets/labels';
+import { ENERGY } from '@/features/pets/labels';
 import { useAppStore } from '@/store/useAppStore';
 import { colors, layout, radius, spacing } from '@/theme';
 
@@ -156,7 +156,6 @@ export default function PetProfileScreen() {
 
   const age = formatAge(pet);
   const breed = getBreed(pet.breedId);
-  const vis = VISIBILITY[pet.photoVisibility];
   const openViewer = (index: number) => router.push({ pathname: '/pet/[id]/photo', params: { id: pet.id, index: String(index) } });
 
   return (
@@ -232,17 +231,10 @@ export default function PetProfileScreen() {
       {tab === 'gallery' ? (
         <View style={styles.galleryWrap}>
           <View style={[styles.padded, styles.visRow]}>
-            <Icon name={vis.icon} size={14} color="textMuted" />
+            <Icon name="globe" size={14} color="textMuted" />
             <Text variant="caption" color="textMuted" style={styles.flex}>
-              Photos : {vis.label}
+              Photos visibles par les membres de 4PetsGo qui consultent le profil de {pet.name}
             </Text>
-            <Pressable
-              accessibilityRole="button"
-              onPress={() => router.push({ pathname: '/pet/[id]/edit', params: { id: pet.id, section: 'privacy' } })}>
-              <Text variant="caption" color="primary">
-                Modifier
-              </Text>
-            </Pressable>
           </View>
           {picker.busy ? <ActivityIndicator color={colors.primary} /> : null}
           {photos.length === 0 ? (

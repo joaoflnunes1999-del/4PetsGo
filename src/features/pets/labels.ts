@@ -1,14 +1,4 @@
-import type { PetProfile, PhotoVisibility } from '@/domain/types';
-
-export const VISIBILITY: Record<PhotoVisibility, { label: string; description: string; icon: 'globe' | 'users' | 'lock' }> = {
-  public: { label: 'Public', description: 'Visibles par les utilisateurs de 4PetsGo sur le profil public de votre animal.', icon: 'globe' },
-  confirmedBookings: {
-    label: 'Réservations confirmées',
-    description: 'Visibles uniquement par le Pet Sitter d’une réservation confirmée.',
-    icon: 'users',
-  },
-  private: { label: 'Privé', description: 'Visibles uniquement par vous.', icon: 'lock' },
-};
+import type { PetProfile } from '@/domain/types';
 
 export const ENERGY: Record<NonNullable<PetProfile['personality']['energy']>, string> = {
   low: 'Calme',

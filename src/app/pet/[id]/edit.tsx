@@ -3,20 +3,19 @@ import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { Button, Card, Chip, ConfirmSheet, Icon, Input, Screen, SegmentedTabs, Text } from '@/components/ui';
-import type { Medication, PetProfile, PhotoVisibility } from '@/domain/types';
+import type { Medication, PetProfile } from '@/domain/types';
 import { isoToFrench, parseFrenchDate } from '@/features/pets/age';
-import { ENERGY, PERSONALITY_TRAITS, VISIBILITY } from '@/features/pets/labels';
+import { ENERGY, PERSONALITY_TRAITS } from '@/features/pets/labels';
 import { newId } from '@/store/ids';
 import { useAppStore } from '@/store/useAppStore';
-import { colors, radius, spacing } from '@/theme';
+import { spacing } from '@/theme';
 
-type Section = 'about' | 'personality' | 'routine' | 'care' | 'privacy';
+type Section = 'about' | 'personality' | 'routine' | 'care';
 const SECTIONS = [
   { value: 'about', label: 'Présentation' },
   { value: 'personality', label: 'Personnalité' },
   { value: 'routine', label: 'Routine' },
   { value: 'care', label: 'Soins' },
-  { value: 'privacy', label: 'Confidentialité' },
 ] as const;
 
 const emptyMed = (): Medication => ({ id: newId('med'), name: '', dosage: '', route: '', frequency: '', schedule: '' });
@@ -170,38 +169,6 @@ export default function EditPet() {
         </>
       ) : null}
 
-      {tab === 'privacy' ? (
-        <>
-          <Text variant="body" color="textMuted">
-            Qui peut voir les photos de {pet.name} ? Vous pouvez changer d’avis à tout moment.
-          </Text>
-          {(Object.keys(VISIBILITY) as PhotoVisibility[]).map((v) => {
-            const on = draft.photoVisibility === v;
-            return (
-              <Pressable
-                key={v}
-                testID={`visibility-${v}`}
-                accessibilityRole="radio"
-                accessibilityState={{ checked: on }}
-                accessibilityLabel={VISIBILITY[v].label}
-                onPress={() => set({ photoVisibility: v })}
-                style={[styles.option, on ? styles.optionOn : null]}>
-                <Icon name={VISIBILITY[v].icon} size={20} color={on ? 'primary' : 'textMuted'} />
-                <View style={styles.flex}>
-                  <Text variant="bodyStrong">{VISIBILITY[v].label}</Text>
-                  <Text variant="caption" color="textMuted">
-                    {VISIBILITY[v].description}
-                  </Text>
-                </View>
-                {on ? <Icon name="check-circle" color="primary" /> : null}
-              </Pressable>
-            );
-          })}
-          <Text variant="caption" color="textMuted">
-            Les informations de soins (vétérinaire, médicaments, puce) restent privées quel que soit ce réglage.
-          </Text>
-        </>
-      ) : null}
 
       <ConfirmSheet
         visible={confirmDelete}
@@ -226,15 +193,4 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   med: { gap: spacing.md },
   medHeader: { flexDirection: 'row', alignItems: 'center' },
-  option: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-    padding: spacing.lg,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.field,
-  },
-  optionOn: { borderColor: colors.selectedBorder, backgroundColor: colors.selected },
 });

@@ -103,7 +103,6 @@ create table public.pets (
   weight_kg numeric(5, 2) check (weight_kg > 0 and weight_kg <= 120),
   bio text check (char_length(bio) <= 220),
   main_photo_id uuid,
-  photo_visibility text not null default 'confirmedBookings' check (photo_visibility in ('public', 'confirmedBookings', 'private')),
   personality jsonb not null default '{"traits":[]}',
   routine jsonb not null default '{}',
   created_at timestamptz not null default now()
@@ -154,7 +153,8 @@ as $$
     or coalesce(current_setting('request.jwt.claims', true)::jsonb ->> 'role', '') = 'service_role';
 $$;
 
-create or replace function private.size_category(p_species text, p_weight numeric)
+-- Weight first; without a weight, the breed's typical size; then dogMedium (mirrors pricing.ts sizeCategoryFor).
+create or replace function private.size_category(p_species text, p_weight numeric, p_breed_size text default null)
 returns text
 language sql
 immutable
@@ -162,7 +162,7 @@ set search_path = ''
 as $$
   select case
     when p_species = 'cat' then 'cat'
-    when p_weight is null then 'dogMedium'
+    when p_weight is null then coalesce(nullif(p_breed_size, 'cat'), 'dogMedium')
     when p_weight < 10 then 'dogSmall'
     when p_weight < 25 then 'dogMedium'
     when p_weight < 40 then 'dogLarge'
@@ -309,17 +309,21 @@ create policy sitter_services_read on public.sitter_services for select to authe
 create policy sitter_services_write_self on public.sitter_services for all to authenticated
   using (sitter_id = (select auth.uid())) with check (sitter_id = (select auth.uid()));
 
--- Pets: owner has full access. Sitters see a pet only through a booking (policy added in booking migration).
-create policy pets_owner_all on public.pets for all to authenticated
+-- Pet profiles and their gallery are public inside the app (like Instagram, founder decision 25/11/2026).
+-- Only the owner writes. Sensitive data lives elsewhere: pet_care and mission photos.
+create policy pets_read_all on public.pets for select to authenticated using (true);
+create policy pets_owner_write on public.pets for insert to authenticated with check (owner_id = (select auth.uid()));
+create policy pets_owner_update on public.pets for update to authenticated
   using (owner_id = (select auth.uid())) with check (owner_id = (select auth.uid()));
+create policy pets_owner_delete on public.pets for delete to authenticated using (owner_id = (select auth.uid()));
 
 create policy pet_care_owner_all on public.pet_care for all to authenticated
   using (exists (select 1 from public.pets p where p.id = pet_id and p.owner_id = (select auth.uid())))
   with check (exists (select 1 from public.pets p where p.id = pet_id and p.owner_id = (select auth.uid())));
 
-create policy pet_photos_owner_all on public.pet_photos for all to authenticated
-  using (owner_id = (select auth.uid()))
+create policy pet_photos_read_all on public.pet_photos for select to authenticated using (true);
+create policy pet_photos_owner_insert on public.pet_photos for insert to authenticated
   with check (exists (select 1 from public.pets p where p.id = pet_id and p.owner_id = (select auth.uid())));
-
-create policy pet_photos_public_read on public.pet_photos for select to authenticated
-  using (exists (select 1 from public.pets p where p.id = pet_id and p.photo_visibility = 'public'));
+create policy pet_photos_owner_update on public.pet_photos for update to authenticated
+  using (owner_id = (select auth.uid())) with check (owner_id = (select auth.uid()));
+create policy pet_photos_owner_delete on public.pet_photos for delete to authenticated using (owner_id = (select auth.uid()));

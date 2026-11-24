@@ -88,22 +88,7 @@ as $$
       or exists (select 1 from public.negotiation_threads t where t.request_id = p_request_id and t.sitter_id = (select auth.uid()));
 $$;
 
--- A sitter who received a request for this pet may see its non-sensitive profile.
-create or replace function private.sitter_has_request_for_pet(p_pet_id uuid)
-returns boolean
-language sql
-stable
-security definer
-set search_path = ''
-as $$
-  select exists (
-    select 1 from public.request_pets rp
-    join public.negotiation_threads t on t.request_id = rp.request_id
-    where rp.pet_id = p_pet_id and t.sitter_id = (select auth.uid())
-  );
-$$;
-
--- Sensitive data (care, address, codes, "confirmed bookings" photos): only the sitter of a CONFIRMED mission,
+-- Sensitive data (care, address, codes, mission photos): only the sitter of a CONFIRMED mission,
 -- during the authorised window (1 day before start → 1 day after end). Revoked on cancellation (PRD §3.9).
 create or replace function private.sitter_has_active_mission_for_pet(p_pet_id uuid)
 returns boolean
@@ -123,10 +108,8 @@ as $$
 $$;
 
 grant execute on function private.is_request_party(text) to authenticated;
-grant execute on function private.sitter_has_request_for_pet(uuid) to authenticated;
 grant execute on function private.sitter_has_active_mission_for_pet(uuid) to authenticated;
 revoke execute on function private.is_request_party(text) from anon, public;
-revoke execute on function private.sitter_has_request_for_pet(uuid) from anon, public;
 revoke execute on function private.sitter_has_active_mission_for_pet(uuid) from anon, public;
 
 -- ---------------------------------------------------------------------------
@@ -152,16 +135,9 @@ create policy offers_read on public.offers for select to authenticated
 create policy missions_read on public.missions for select to authenticated
   using (owner_id = (select auth.uid()) or sitter_id = (select auth.uid()));
 
--- Sitters see pets of requests addressed to them; sensitive care data only during a confirmed mission.
-create policy pets_sitter_read on public.pets for select to authenticated
-  using ((select private.sitter_has_request_for_pet(id)));
+-- Care data (vet, medications, microchip) only for the sitter of a confirmed mission, during the mission.
 create policy pet_care_sitter_read on public.pet_care for select to authenticated
   using ((select private.sitter_has_active_mission_for_pet(pet_id)));
-create policy pet_photos_confirmed_read on public.pet_photos for select to authenticated
-  using (
-    exists (select 1 from public.pets p where p.id = pet_id and p.photo_visibility = 'confirmedBookings')
-    and (select private.sitter_has_active_mission_for_pet(pet_id))
-  );
 
 -- ---------------------------------------------------------------------------
 -- Pricing helpers (server-side source of truth for the floor and listed prices)
@@ -174,8 +150,10 @@ stable
 set search_path = ''
 as $$
   select case when p_service = 'dogWalking' then 1 else (
-    select coalesce(sum((c.min_daily_cents ->> private.size_category(p.species, p.weight_kg))::integer), 0) * p_days
-    from public.pets p, public.pricing_config c
+    select coalesce(sum((c.min_daily_cents ->> private.size_category(p.species, p.weight_kg, b.typical_size))::integer), 0) * p_days
+    from public.pets p
+    join public.breeds b on b.id = p.breed_id
+    cross join public.pricing_config c
     where p.id = any (p_pet_ids) and c.country = p_country
   ) end;
 $$;
@@ -190,10 +168,11 @@ as $$
     select s.walk_price_cents * p_days from public.sitter_services s where s.sitter_id = p_sitter_id and s.type = 'dogWalking'
   ) else (
     select sum(greatest(
-      coalesce((s.daily_rates ->> private.size_category(p.species, p.weight_kg))::integer, 0),
-      (c.min_daily_cents ->> private.size_category(p.species, p.weight_kg))::integer
+      coalesce((s.daily_rates ->> private.size_category(p.species, p.weight_kg, b.typical_size))::integer, 0),
+      (c.min_daily_cents ->> private.size_category(p.species, p.weight_kg, b.typical_size))::integer
     )) * p_days
     from public.pets p
+    join public.breeds b on b.id = p.breed_id
     cross join public.pricing_config c
     join public.sitter_services s on s.sitter_id = p_sitter_id and s.type = p_service
     where p.id = any (p_pet_ids) and c.country = p_country

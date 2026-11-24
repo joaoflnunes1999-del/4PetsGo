@@ -32,10 +32,9 @@ begin;
 set local role authenticated;
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000c1","role":"authenticated"}', true);
 do $$ begin
-  assert (select count(*) from public.pets) = 1, 'sitter with request sees the pet';
   assert (select count(*) from public.pet_care) = 0, 'sitter without confirmed mission cannot see care';
   assert (select count(*) from public.booking_requests) = 1, 'sitter sees the request';
-  raise notice 'sitter with a request: sees the pet profile, never its care data before a confirmed mission';
+  raise notice 'sitter with a request: sees the request, never the care data before a confirmed mission';
 end $$;
 commit;
 begin;
@@ -128,7 +127,6 @@ set local role authenticated;
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000c2","role":"authenticated"}', true);
 do $$ begin
   assert (select count(*) from public.pet_care) = 1, 'confirmed sitter sees care';
-  assert (select count(*) from public.pet_photos) = 1, 'confirmed sitter sees confirmedBookings photos';
 end $$;
 commit;
 begin;
@@ -136,7 +134,6 @@ set local role authenticated;
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000c1","role":"authenticated"}', true);
 do $$ begin
   assert (select count(*) from public.pet_care) = 0, 'losing sitter never sees care';
-  assert (select count(*) from public.pet_photos) = 0, 'losing sitter does not see confirmedBookings photos';
 end $$;
 commit;
 update public.missions set status = 'cancelled' where request_id = (select v from public._t where k = 'req');
@@ -174,4 +171,14 @@ begin
   raise notice 'expiry: offers expire after 48 h (scheduled job) and the request closes';
 end $$;
 commit;
+-- Floor without weight: breed typical size (Saint-bernard = dogXL → 17 € x 2 days).
+insert into public.pets (id, owner_id, name, species, breed_id) values
+  ('00000000-0000-0000-0000-00000000f002', '00000000-0000-0000-0000-0000000000a1', 'Bernie', 'dog', 'dog-saint-bernard');
+do $$ begin
+  assert private.request_floor_cents('boarding', 'FR', array['00000000-0000-0000-0000-00000000f002']::uuid[], 2) = 1700 * 2,
+    'floor uses breed typical size when weight is unknown';
+  assert private.request_floor_cents('boarding', 'CH', array['00000000-0000-0000-0000-00000000f001','00000000-0000-0000-0000-00000000f002']::uuid[], 3)
+    = (3080 + 4030) * 3, 'floor sums every pet (weight or breed) x days, CH grid';
+  raise notice 'floor: per pet (weight, else breed size) x days; an owner can never propose less';
+end $$;
 drop table public._t;

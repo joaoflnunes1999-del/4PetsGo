@@ -13,7 +13,7 @@ create policy pet_photos_objects_owner_update on storage.objects for update to a
   using (bucket_id = 'pet-photos' and (storage.foldername(name))[1] = (select auth.uid())::text);
 create policy pet_photos_objects_owner_delete on storage.objects for delete to authenticated
   using (bucket_id = 'pet-photos' and (storage.foldername(name))[1] = (select auth.uid())::text);
--- Reading a file follows the pet_photos row visibility (owner / public / confirmed mission), evaluated with RLS.
+-- Gallery files are readable by signed-in users (public inside the app), like their pet_photos rows.
 create policy pet_photos_objects_read on storage.objects for select to authenticated
   using (bucket_id = 'pet-photos' and exists (select 1 from public.pet_photos p where p.storage_path = name));
 
