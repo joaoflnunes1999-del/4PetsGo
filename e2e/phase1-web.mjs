@@ -112,9 +112,14 @@ try {
     if (await id('sitter-card-sitter-camille').count()) throw new Error('Camille should be filtered out');
     await shot('search-results');
   });
-  await step('sitter profile: dynamic home section', async () => {
+  await step('sitter profile: living situation first, services after, no prices', async () => {
     await id('sitter-card-sitter-ines').click();
-    await page.getByText('My Home & Environment').waitFor();
+    await page.getByText('Son cadre de vie').waitFor();
+    const factsBox = await id('sitter-facts').boundingBox();
+    const servicesBox = await id('service-boarding').boundingBox();
+    if (!(factsBox.y < servicesBox.y)) throw new Error('facts must appear before services');
+    await id('sitter-facts').getByText('41 ans', { exact: true }).waitFor();
+    if (await page.getByText(/€ \/ jour/).count()) throw new Error('prices must not be shown on the profile');
     await shot('sitter-profile');
     await id('sitter-toggle').click();
     await page.getByRole('button', { name: 'Retour' }).click();
@@ -180,6 +185,7 @@ try {
     await id('welcome-start').click();
     await id('role-sitter').click();
     await id('sitter-firstname').fill('Alex');
+    await id('sitter-age').fill('29');
     await id('city-geneve').click();
     await id('svc-boarding').click();
     await page.getByText('My Home & Environment').waitFor();
