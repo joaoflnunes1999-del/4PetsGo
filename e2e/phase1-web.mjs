@@ -165,6 +165,40 @@ try {
     await page.getByText('CLÔTURÉE', { exact: true }).waitFor();
     await shot('mission-locked');
   });
+  await step('confirm mission → WhatsApp-like chat with text, file and First Night Update', async () => {
+    await id('confirm-mission').click();
+    await id('chat-input').waitFor();
+    await page.getByText('Mission confirmée · le chat est ouvert').waitFor();
+    await id('fnu-pending').waitFor();
+    await id('chat-input').fill('Bonjour Inès ! Pistache adore sa balle bleue.');
+    await id('chat-send').click();
+    await page.getByText('Pistache adore sa balle bleue').waitFor();
+    const [chooser] = await Promise.all([page.waitForEvent('filechooser'), id('chat-attach').click()]);
+    await chooser.setFiles(path.join(fixtures, 'ordonnance.pdf'));
+    await page.getByText('ordonnance.pdf').waitFor();
+    await shot('chat-fnu-pending');
+    await id('chat-codes').click();
+    await id('dropoff-code').waitFor();
+    await page.getByText(/Ce code ne doit être donné qu’au moment de la remise/).waitFor();
+    await page.waitForTimeout(600);
+    await shot('chat-dropoff-code');
+    await page.getByRole('button', { name: 'Fermer', exact: true }).click();
+    await id('dropoff-code').waitFor({ state: 'detached' });
+  });
+  await step('First Night Update answered → green check + Paw Points reward in the corner', async () => {
+    if (await id('fnu-reward').count()) throw new Error('no reward before the answer');
+    await id('fnu-answer').click();
+    await id('fnu-night-calm').click();
+    await id('fnu-morning-playful').click();
+    await id('fnu-comment').fill('Il a dormi au pied du lit et a réclamé sa balle dès 7 h !');
+    await id('fnu-submit').click();
+    await id('fnu-answered').waitFor();
+    await id('fnu-reward').getByText('+5').waitFor();
+    await page.waitForTimeout(400);
+    await shot('chat-fnu-answered');
+    await page.getByRole('button', { name: 'Retour' }).first().click();
+    await id('open-chat').waitFor();
+  });
   await step('missions tab lists the locked mission', async () => {
     await page.getByRole('button', { name: 'Voir mes missions' }).click();
     await page.getByText(missionId).waitFor();
