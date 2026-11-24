@@ -173,6 +173,8 @@ Sécurité : les codes ne figurent jamais dans les messages ni dans les notifica
 
 ### 3.9 Chat et suivi de mission
 - Le chat se débloque automatiquement **après le paiement**.
+- **Fichiers** : on peut envoyer des photos et des documents (PDF, Word, texte ; 20 Mo maximum). Ils restent privés aux deux parties de la mission.
+- **Messages non modifiables et non supprimables**, par l'Owner comme par le Pet Sitter (validé le 25/11/2026). L'historique sert de référence en cas de litige ou d'annulation. Si un compte est supprimé, ses messages restent visibles pour l'autre partie, sans l'identité de l'auteur.
 - On y trouve des messages, des photos et une **chronologie des événements** : réservation confirmée, mission commencée, photo, rapport, médicament administré, mission terminée.
 - **Adresse exacte** révélée dans le chat uniquement après le paiement : adresse du Pet Sitter pour le Pet Boarding, de l'Owner pour les Home Visits, point de rendez-vous pour le Dog Walking.
 - **Codes d'accès** consultables uniquement dans le chat authentifié, **jamais dans une notification**.
