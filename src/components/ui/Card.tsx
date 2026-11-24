@@ -6,7 +6,7 @@ type Props = ViewProps & { onPress?: () => void; padded?: boolean; tone?: 'surfa
 
 export function Card({ onPress, padded = true, tone = 'surface', style, children, ...rest }: Props) {
   const toneStyle = {
-    surface: { backgroundColor: colors.surface, ...shadow.card },
+    surface: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, ...shadow.card },
     muted: { backgroundColor: colors.surfaceMuted },
     primarySoft: { backgroundColor: colors.primarySoft },
     accentSoft: { backgroundColor: colors.accentSoft },
@@ -31,7 +31,7 @@ export function Card({ onPress, padded = true, tone = 'surface', style, children
 }
 
 const styles = StyleSheet.create({
-  base: { borderRadius: radius.lg },
+  base: { borderRadius: radius.md },
   padded: { padding: spacing.lg },
-  pressed: { opacity: 0.85, transform: [{ scale: 0.99 }] },
+  pressed: { opacity: 0.8 },
 });

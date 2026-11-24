@@ -14,7 +14,7 @@ type Props = {
 };
 
 export function Chip({ label, selected, onPress, icon, testID }: Props) {
-  const fg = selected ? 'textInverse' : 'text';
+  const fg = selected ? 'primary' : 'text';
   return (
     <Pressable
       testID={testID}
@@ -42,11 +42,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing.xs,
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
+    paddingVertical: spacing.xs + 3,
     borderRadius: radius.pill,
     borderWidth: 1,
   },
   idle: { backgroundColor: colors.surface, borderColor: colors.border },
-  selected: { backgroundColor: colors.primary, borderColor: colors.primary },
+  selected: { backgroundColor: colors.primarySoft, borderColor: colors.primary },
   pressed: { opacity: 0.8 },
 });

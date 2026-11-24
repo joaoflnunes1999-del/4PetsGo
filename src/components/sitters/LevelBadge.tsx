@@ -34,7 +34,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primarySoft,
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xxs + 1,
-    borderRadius: radius.pill,
+    borderRadius: radius.xs,
     alignSelf: 'flex-start',
   },
   dot: { width: 3, height: 3, borderRadius: 2, backgroundColor: colors.primary, opacity: 0.4 },

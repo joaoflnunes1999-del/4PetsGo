@@ -25,7 +25,7 @@ type Props = {
 const styleByVariant: Record<Variant, { bg: string; bgPressed: string; fg: keyof typeof colors; border?: string }> = {
   primary: { bg: colors.primary, bgPressed: colors.primaryPressed, fg: 'textInverse' },
   accent: { bg: colors.accent, bgPressed: colors.accentStrong, fg: 'text' },
-  secondary: { bg: colors.surface, bgPressed: colors.surfaceMuted, fg: 'primary', border: colors.border },
+  secondary: { bg: colors.surface, bgPressed: colors.brandTint, fg: 'primary', border: colors.primary },
   ghost: { bg: 'transparent', bgPressed: colors.surfaceMuted, fg: 'primary' },
   danger: { bg: colors.dangerSoft, bgPressed: colors.dangerSoft, fg: 'danger' },
 };
@@ -81,9 +81,9 @@ export function Button({
 }
 
 const styles = StyleSheet.create({
-  base: { borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center' },
-  md: { minHeight: 52, paddingHorizontal: spacing.xl },
-  sm: { minHeight: 38, paddingHorizontal: spacing.lg },
+  base: { borderRadius: radius.md, alignItems: 'center', justifyContent: 'center' },
+  md: { minHeight: 48, paddingHorizontal: spacing.xl },
+  sm: { minHeight: 36, paddingHorizontal: spacing.md },
   full: { alignSelf: 'stretch' },
   auto: { alignSelf: 'flex-start' },
   content: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },

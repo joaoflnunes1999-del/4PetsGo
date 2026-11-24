@@ -1,6 +1,6 @@
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
-import { colors, radius, spacing } from '@/theme';
+import { colors, spacing } from '@/theme';
 
 import { Text } from './Text';
 
@@ -11,6 +11,7 @@ type Props<T extends string> = {
   scrollable?: boolean;
 };
 
+/** Underlined text tabs (marketplace style): active tab in brand green with a 2 px indicator. */
 export function SegmentedTabs<T extends string>({ options, value, onChange, scrollable }: Props<T>) {
   const items = options.map((o) => {
     const active = o.value === value;
@@ -22,7 +23,7 @@ export function SegmentedTabs<T extends string>({ options, value, onChange, scro
         accessibilityLabel={o.label}
         onPress={() => onChange(o.value)}
         style={[styles.item, scrollable ? null : styles.itemFlex, active ? styles.active : null]}>
-        <Text variant="callout" color={active ? 'text' : 'textMuted'} numberOfLines={1}>
+        <Text variant={active ? 'bodyStrong' : 'callout'} color={active ? 'primary' : 'textMuted'} numberOfLines={1}>
           {o.label}
         </Text>
       </Pressable>
@@ -30,28 +31,28 @@ export function SegmentedTabs<T extends string>({ options, value, onChange, scro
   });
   if (scrollable) {
     return (
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.track}>
-        {items}
-      </ScrollView>
+      <View style={styles.track}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scroll}>
+          {items}
+        </ScrollView>
+      </View>
     );
   }
-  return <View style={styles.track}>{items}</View>;
+  return <View style={[styles.track, styles.row]}>{items}</View>;
 }
 
 const styles = StyleSheet.create({
-  track: {
-    flexDirection: 'row',
-    backgroundColor: colors.surfaceMuted,
-    borderRadius: radius.pill,
-    padding: spacing.xs,
-    gap: spacing.xs,
-  },
+  track: { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.border },
+  row: { flexDirection: 'row' },
+  scroll: { gap: spacing.lg },
   item: {
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
-    borderRadius: radius.pill,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.xs,
     alignItems: 'center',
+    borderBottomWidth: 2,
+    borderBottomColor: 'transparent',
+    marginBottom: -StyleSheet.hairlineWidth,
   },
   itemFlex: { flex: 1 },
-  active: { backgroundColor: colors.surface },
+  active: { borderBottomColor: colors.primary },
 });

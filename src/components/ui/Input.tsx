@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
   field: {
     flexDirection: 'row',
     alignItems: 'center',
-    minHeight: 50,
+    minHeight: 48,
     paddingHorizontal: spacing.lg,
     borderRadius: radius.md,
     borderWidth: 1,
