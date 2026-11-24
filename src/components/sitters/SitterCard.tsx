@@ -70,7 +70,7 @@ export function SitterCard({ sitter, distanceKm, boosted, selected, onToggle, on
 
 const styles = StyleSheet.create({
   card: { gap: spacing.md, borderWidth: 1.5, borderColor: colors.border },
-  selected: { borderColor: colors.primary },
+  selected: { borderColor: colors.action },
   row: { flexDirection: 'row', gap: spacing.md, alignItems: 'center' },
   body: { flex: 1, gap: spacing.xxs },
   nameRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  checkOn: { backgroundColor: colors.primary, borderColor: colors.primary },
+  checkOn: { backgroundColor: colors.action, borderColor: colors.action },
   tags: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xs },
   tag: { backgroundColor: colors.brandTint, paddingHorizontal: spacing.sm, paddingVertical: spacing.xxs, borderRadius: radius.xs },
   footer: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },

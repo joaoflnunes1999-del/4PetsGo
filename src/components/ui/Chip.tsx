@@ -14,7 +14,7 @@ type Props = {
 };
 
 export function Chip({ label, selected, onPress, icon, testID }: Props) {
-  const fg = selected ? 'primary' : 'text';
+  const fg = 'text';
   return (
     <Pressable
       testID={testID}
@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.pill,
     borderWidth: 1,
   },
-  idle: { backgroundColor: colors.surface, borderColor: colors.border },
-  selected: { backgroundColor: colors.selected, borderColor: colors.primary },
+  idle: { backgroundColor: colors.field, borderColor: colors.border },
+  selected: { backgroundColor: colors.selected, borderColor: colors.selectedBorder },
   pressed: { opacity: 0.8 },
 });

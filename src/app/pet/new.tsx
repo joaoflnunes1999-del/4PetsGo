@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     paddingVertical: spacing.xl,
     borderRadius: radius.lg,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.field,
     borderWidth: 1,
     borderColor: colors.border,
   },

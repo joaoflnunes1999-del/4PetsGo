@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg,
     borderWidth: 1,
     borderColor: colors.border,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.field,
   },
-  optionOn: { borderColor: colors.primary, backgroundColor: colors.primarySoft },
+  optionOn: { borderColor: colors.selectedBorder, backgroundColor: colors.selected },
 });

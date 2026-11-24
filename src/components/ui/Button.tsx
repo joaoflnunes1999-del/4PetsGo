@@ -23,9 +23,9 @@ type Props = {
 };
 
 const styleByVariant: Record<Variant, { bg: string; bgPressed: string; fg: keyof typeof colors; border?: string }> = {
-  primary: { bg: colors.primary, bgPressed: colors.primaryPressed, fg: 'textInverse' },
+  primary: { bg: colors.action, bgPressed: colors.actionPressed, fg: 'textInverse' },
   accent: { bg: colors.accent, bgPressed: colors.accentStrong, fg: 'text' },
-  secondary: { bg: colors.surface, bgPressed: colors.brandTint, fg: 'primary', border: colors.primary },
+  secondary: { bg: 'transparent', bgPressed: colors.brandTint, fg: 'primary', border: colors.primary },
   ghost: { bg: 'transparent', bgPressed: colors.surfaceMuted, fg: 'primary' },
   danger: { bg: colors.dangerSoft, bgPressed: colors.dangerSoft, fg: 'danger' },
 };
@@ -71,7 +71,7 @@ export function Button({
       ) : (
         <View style={styles.content}>
           {icon ? <Icon name={icon} size={size === 'sm' ? 16 : 18} color={v.fg} /> : null}
-          <Text variant={size === 'sm' ? 'callout' : 'bodyStrong'} color={v.fg}>
+          <Text variant={size === 'sm' ? 'callout' : 'button'} color={v.fg}>
             {label}
           </Text>
         </View>

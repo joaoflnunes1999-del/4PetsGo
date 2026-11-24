@@ -54,5 +54,5 @@ const styles = StyleSheet.create({
     marginBottom: -StyleSheet.hairlineWidth,
   },
   itemFlex: { flex: 1 },
-  active: { borderBottomColor: colors.primary },
+  active: { borderBottomColor: colors.action },
 });

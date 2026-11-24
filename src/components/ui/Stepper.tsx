@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.pill,
     borderWidth: 1,
     borderColor: colors.border,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.field,
     alignItems: 'center',
     justifyContent: 'center',
   },

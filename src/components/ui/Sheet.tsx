@@ -74,7 +74,7 @@ export function ActionSheet({
 const styles = StyleSheet.create({
   backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.35)' },
   sheet: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.background,
     borderTopLeftRadius: radius.xl,
     borderTopRightRadius: radius.xl,
     paddingHorizontal: layout.screenPadding,
