@@ -179,7 +179,7 @@ Sécurité : les codes ne figurent jamais dans les messages ni dans les notifica
 - **Adresse exacte** révélée dans le chat uniquement après le paiement : adresse du Pet Sitter pour le Pet Boarding, de l'Owner pour les Home Visits, point de rendez-vous pour le Dog Walking.
 - **Codes d'accès** consultables uniquement dans le chat authentifié, **jamais dans une notification**.
 - **Photo obligatoire toutes les 48 h**, avec rappels automatiques, plus un rapport final.
-- **First Night Update** : il n'existe **qu'après la remise de l'animal** (code de remise saisi). Le lendemain matin de la première nuit, le Pet Sitter remplit un questionnaire court (2 questions, un commentaire et une photo facultatifs).
+- **First Night Update** : il n'existe **qu'après la remise de l'animal** (code de remise saisi). **Récompense** (⚠️ indicative) : 5 Paw Points, portés à 8 si le commentaire dépasse 15 mots, plus 1 par question répondue, soit **7 ou 10 Paw Points**, pour inciter le Pet Sitter à écrire un vrai commentaire. Le lendemain matin de la première nuit, le Pet Sitter remplit un questionnaire court (2 questions, un commentaire et une photo facultatifs).
 - **Photos de mission ≠ galerie personnelle** : l'Owner peut copier une photo de mission dans la galerie de son animal, mais rien n'y est ajouté automatiquement.
 - L'accès du Pet Sitter au profil et aux soins de l'animal est **révoqué** à l'annulation de la mission ou à la fin de la période autorisée.
 

@@ -201,10 +201,15 @@ try {
     await id('fnu-answer').click();
     await id('fnu-night-calm').click();
     await id('fnu-morning-playful').click();
-    await id('fnu-comment').fill('Il a dormi au pied du lit et a réclamé sa balle dès 7 h !');
+    await id('fnu-comment').fill('Il a dormi au pied du lit !');
+    await id('fnu-reward-hint').getByText(/gagner 10 Paw Points au lieu de 7/).waitFor();
+    await id('fnu-comment').fill('Pistache a dormi toute la nuit au pied du lit, puis il a réclamé sa balle bleue dès sept heures du matin.');
+    await id('fnu-reward-hint').getByText(/vous gagnerez 10 Paw Points/).waitFor();
+    await page.waitForTimeout(300);
+    await shot('fnu-form-detailed');
     await id('fnu-submit').click();
     await id('fnu-answered').waitFor();
-    await id('fnu-reward').getByText('+5').waitFor();
+    await id('fnu-reward').getByText('+10').waitFor();
     await page.waitForTimeout(400);
     await shot('chat-fnu-answered');
     await page.getByRole('button', { name: 'Retour' }).first().click();
