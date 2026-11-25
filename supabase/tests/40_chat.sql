@@ -105,14 +105,18 @@ begin
   reset role; perform pg_temp.act('00000000-0000-0000-0000-0000000000c1'); set local role authenticated;
   perform public.enter_dropoff_code(v_m, v_code);
   v_before := (select paw_points from public.sitter_profiles where id = auth.uid());
-  perform public.submit_first_night_update(v_m, 'calm', 'playful', 'Nuit parfaite');
-  assert (select paw_points from public.sitter_profiles where id = auth.uid()) = v_before + 5, 'reward credited';
+  perform public.submit_first_night_update(v_m, 'calm', 'playful',
+    'Pistache a dormi toute la nuit au pied du lit, puis il a réclamé sa balle bleue dès sept heures du matin');
+  assert (select paw_points from public.sitter_profiles where id = auth.uid()) = v_before + 10, 'detailed comment (16+ words): 8 + 2 = 10';
   begin perform public.submit_first_night_update(v_m, 'calm', 'playful'); raise exception 'expected ALREADY_SENT';
   exception when others then assert sqlerrm = 'ALREADY_SENT', sqlerrm; end;
   reset role; perform pg_temp.act('00000000-0000-0000-0000-0000000000a1'); set local role authenticated;
   assert (select night from public.first_night_reports where mission_id = v_m) = 'calm', 'owner reads the report';
   reset role;
-  raise notice 'first night update: only after the hand-over, once per mission, rewarded with Paw Points';
+  raise notice 'first night update: only after the hand-over, once per mission; 10 Paw Points with a 16+ word comment';
+end $$;
+do $$ begin
+  assert (select points from public.paw_points_ledger where reason = 'first_night_update' limit 1) = 10;
 end $$;
 drop owned by chat_tester;
 drop role chat_tester;

@@ -5,6 +5,7 @@ import { StyleSheet, View } from 'react-native';
 import { PawCoin } from '@/components/levels/PawCoin';
 import { Button, Chip, Icon, Input, Text } from '@/components/ui';
 import { formatTime } from '@/features/chat/format';
+import { FIRST_NIGHT_REWARD, countWords, firstNightReward } from '@/features/levels/levels';
 import { MORNING_LABELS, NIGHT_LABELS, type FirstNightUpdate, type MorningAnswer, type NightAnswer } from '@/features/chat/types';
 import { colors, radius, spacing } from '@/theme';
 
@@ -134,14 +135,42 @@ export function FirstNightForm({
           <Chip key={k} label={MORNING_LABELS[k]} selected={morning === k} onPress={() => setMorning(k)} testID={`fnu-morning-${k}`} />
         ))}
       </View>
-      <Input label="Commentaire (facultatif)" value={comment} onChangeText={setComment} multiline maxLength={300} testID="fnu-comment" />
+      <Input label="Commentaire (facultatif)" value={comment} onChangeText={setComment} multiline maxLength={600} testID="fnu-comment" />
+      <RewardHint comment={comment} />
       {onPickPhoto ? <Button label="Ajouter une photo (facultatif)" variant="ghost" size="sm" icon="camera" onPress={onPickPhoto} /> : null}
       <Button label="Envoyer le rapport" disabled={!night || !morning} onPress={() => onSubmit({ night: night!, morning: morning!, comment })} testID="fnu-submit" />
     </View>
   );
 }
 
+/** Encourages a detailed comment: 7 Paw Points, or 10 with more than 15 words. */
+function RewardHint({ comment }: { comment: string }) {
+  const words = countWords(comment);
+  const detailed = words >= FIRST_NIGHT_REWARD.detailedMinWords;
+  const reward = firstNightReward({ answers: 2, comment });
+  return (
+    <View style={[styles.hint, detailed ? styles.hintDone : null]} testID="fnu-reward-hint">
+      <PawCoin size={20} />
+      <Text variant="caption" style={styles.flex}>
+        {detailed
+          ? `Commentaire détaillé : vous gagnerez ${reward} Paw Points.`
+          : `Écrivez plus de 15 mots pour gagner ${firstNightReward({ answers: 2, comment: 'x '.repeat(FIRST_NIGHT_REWARD.detailedMinWords) })} Paw Points au lieu de ${reward}. (${words}/${FIRST_NIGHT_REWARD.detailedMinWords} mots)`}
+      </Text>
+      {detailed ? <Icon name="check-circle" size={16} color="success" /> : null}
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
+  hint: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    backgroundColor: colors.accentSoft,
+    padding: spacing.md,
+    borderRadius: radius.md,
+  },
+  hintDone: { backgroundColor: colors.successSoft },
   wrap: { paddingHorizontal: spacing.md, marginVertical: spacing.sm, alignItems: 'center' },
   card: {
     width: '100%',

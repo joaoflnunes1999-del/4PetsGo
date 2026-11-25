@@ -23,7 +23,7 @@ import {
   type NegotiationAction,
 } from '@/features/booking/negotiation';
 import type { ChatFile, ChatMessage, ChatParty, FirstNightUpdate, MissionChat } from '@/features/chat/types';
-import { PAW_REWARDS } from '@/features/levels/levels';
+import { firstNightReward } from '@/features/levels/levels';
 import { getCity } from '@/features/sitters/cities';
 import { DEMO_SITTERS } from '@/features/sitters/demoSitters';
 
@@ -221,7 +221,7 @@ export const useAppStore = create<State & Actions>()(
           messages: [
             { id: newId('msg'), from: 'system', kind: 'event', body: 'Mission confirmée · le chat est ouvert', createdAt: now },
           ],
-          firstNight: { status: 'pending', rewardPoints: PAW_REWARDS.firstNightUpdate },
+          firstNight: { status: 'pending', rewardPoints: firstNightReward({ answers: 2 }) },
         };
         set((s) => ({ chats: { ...s.chats, [requestId]: chat } }));
         return { ok: true };
@@ -289,7 +289,14 @@ export const useAppStore = create<State & Actions>()(
             ...s.chats,
             [requestId]: {
               ...chat,
-              firstNight: { ...chat.firstNight, ...answer, comment: answer.comment?.trim() || undefined, status: 'answered', answeredAt: now },
+              firstNight: {
+                ...chat.firstNight,
+                ...answer,
+                comment: answer.comment?.trim() || undefined,
+                status: 'answered',
+                answeredAt: now,
+                rewardPoints: firstNightReward({ answers: 2, comment: answer.comment }),
+              },
             },
           },
         }));

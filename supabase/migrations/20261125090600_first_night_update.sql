@@ -6,7 +6,7 @@ create table public.first_night_reports (
   sitter_id uuid references public.profiles (id) on delete set null,
   night text not null check (night in ('calm', 'woke', 'restless')),
   morning text not null check (morning in ('relaxed', 'playful', 'stressed', 'tired')),
-  comment text check (char_length(comment) <= 300),
+  comment text check (char_length(comment) <= 600),
   photo_path text, -- mission-files bucket
   created_at timestamptz not null default now()
 );
@@ -26,8 +26,14 @@ set search_path = ''
 as $$
 declare
   v_m public.missions;
-  v_points integer := 5; -- ⚠️ indicative reward (PAW_REWARDS.firstNightUpdate)
+  v_words integer;
+  v_points integer;
 begin
+  -- Reward (founder rule 25/11/2026, ⚠️ indicative): base 5, or 8 with a comment of more than 15 words,
+  -- +1 per answered question (2) → 7 or 10. Mirrors firstNightReward() in levels.ts.
+  v_words := coalesce(array_length(regexp_split_to_array(trim(coalesce(p_comment, '')), '\s+'), 1), 0);
+  if trim(coalesce(p_comment, '')) = '' then v_words := 0; end if;
+  v_points := (case when v_words > 15 then 8 else 5 end) + 2;
   select * into v_m from public.missions where id = p_mission_id for update;
   if not found or v_m.sitter_id is distinct from (select auth.uid()) then raise exception 'FORBIDDEN'; end if;
   if v_m.status <> 'in_progress' then raise exception 'NOT_STARTED'; end if;
