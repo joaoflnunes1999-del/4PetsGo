@@ -170,6 +170,7 @@ try {
     await id('chat-input').waitFor();
     await page.getByText('Mission confirmée · le chat est ouvert').waitFor();
     await id('fnu-pending').waitFor();
+    await page.getByText('Dès demain matin, Inès vous dira comment Pistache a passé sa première nuit…').waitFor();
     await id('chat-input').fill('Bonjour Inès ! Pistache adore sa balle bleue.');
     await id('chat-send').click();
     await page.getByText('Pistache adore sa balle bleue').waitFor();

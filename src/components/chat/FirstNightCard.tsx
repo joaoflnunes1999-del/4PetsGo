@@ -78,7 +78,7 @@ export function FirstNightCard({ update, petName, sitterName, viewer, onAnswer }
           <View style={styles.answers}>
             <Text variant="callout" color="textMuted">
               {viewer === 'owner'
-                ? `Demain matin, ${sitterName} vous dira comment ${petName} a passé sa première nuit et comment il se sent.`
+                ? `Dès demain matin, ${sitterName} vous dira comment ${petName} a passé sa première nuit…`
                 : `Racontez au propriétaire comment ${petName} a passé sa première nuit. Deux questions, 30 secondes.`}
             </Text>
             {onAnswer ? (
