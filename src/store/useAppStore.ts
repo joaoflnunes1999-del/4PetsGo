@@ -22,7 +22,7 @@ import {
   respond,
   type NegotiationAction,
 } from '@/features/booking/negotiation';
-import type { ChatFile, ChatMessage, ChatParty, FirstNightUpdate, MissionChat } from '@/features/chat/types';
+import { PICKUP_REASON_LABELS, type ChatFile, type ChatMessage, type ChatParty, type FirstNightUpdate, type MissionChat, type PickupReason } from '@/features/chat/types';
 import { firstNightReward } from '@/features/levels/levels';
 import { getCity } from '@/features/sitters/cities';
 import { DEMO_SITTERS } from '@/features/sitters/demoSitters';
@@ -80,6 +80,10 @@ type Actions = {
   sendChatMessage: (requestId: string, from: ChatParty, body: string) => void;
   sendChatFile: (requestId: string, from: ChatParty, file: ChatFile) => void;
   answerFirstNight: (requestId: string, answer: Pick<FirstNightUpdate, 'night' | 'morning' | 'comment' | 'photo'>) => Result;
+  /** Sitter generates the pick-up code (always available while in progress). Early end needs a reason. */
+  generatePickupCode: (requestId: string, reason?: PickupReason) => { ok: true; code: string } | { ok: false; error: string };
+  /** Owner types the pick-up code → mission completed. */
+  enterPickupCode: (requestId: string, code: string) => 'completed' | 'invalid';
   /** Sitter types the drop-off code at hand-over → mission starts; the First Night Update appears only then. */
   enterDropoffCode: (requestId: string, code: string) => 'started' | 'invalid' | 'locked_out';
   resetAll: () => void;
@@ -255,6 +259,55 @@ export const useAppStore = create<State & Actions>()(
           },
         }));
         return 'started';
+      },
+
+      generatePickupCode: (requestId, reason) => {
+        const chat = get().chats[requestId];
+        const req = get().requests.find((r) => r.id === requestId);
+        if (!chat || !req || chat.status !== 'in_progress') return { ok: false, error: 'La mission n’a pas commencé.' };
+        const end = new Date(`${req.startDate}T12:00:00`);
+        end.setDate(end.getDate() + (req.service === 'dogWalking' ? 0 : req.days - 1));
+        const lastDay = new Date().setHours(23, 59, 59, 999) >= end.getTime();
+        const finalReason: PickupReason = lastDay ? 'completed' : (reason ?? 'completed');
+        if (!lastDay && finalReason === 'completed') return { ok: false, error: 'Indiquez pourquoi la mission se termine plus tôt.' };
+        const code = String(Math.floor(Math.random() * 1_000_000)).padStart(6, '0');
+        const now = new Date().toISOString();
+        set((s) => ({
+          chats: {
+            ...s.chats,
+            [requestId]: {
+              ...chat,
+              pickupCode: code,
+              pickupReason: finalReason,
+              messages: [
+                ...chat.messages,
+                // The reason is visible to both; the code itself never appears in a message.
+                { id: newId('msg'), from: 'system', kind: 'event', body: `Code de fin de mission généré · ${PICKUP_REASON_LABELS[finalReason]}`, createdAt: now },
+              ],
+            },
+          },
+        }));
+        return { ok: true, code };
+      },
+
+      enterPickupCode: (requestId, code) => {
+        const chat = get().chats[requestId];
+        if (!chat || chat.status !== 'in_progress' || !chat.pickupCode) return 'invalid';
+        if (code.replace(/\s/g, '') !== chat.pickupCode) return 'invalid';
+        const now = new Date().toISOString();
+        set((s) => ({
+          chats: {
+            ...s.chats,
+            [requestId]: {
+              ...chat,
+              status: 'completed',
+              endedAt: now,
+              pickupCode: undefined,
+              messages: [...chat.messages, { id: newId('msg'), from: 'system', kind: 'event', body: 'Animal récupéré · mission terminée', createdAt: now }],
+            },
+          },
+        }));
+        return 'completed';
       },
 
       // Messages are append-only: there is deliberately no edit/delete action (founder rule).
