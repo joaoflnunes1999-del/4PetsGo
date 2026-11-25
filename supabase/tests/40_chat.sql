@@ -93,6 +93,27 @@ begin
   reset role;
   raise notice 'chat: messages are immutable for both parties (RLS + trigger)';
 end $$;
+-- First Night Update: impossible before the hand-over, possible once, rewarded.
+do $$
+declare v_m uuid := (select v::uuid from public._c where k = 'm'); v_code text; v_before integer;
+begin
+  perform pg_temp.act('00000000-0000-0000-0000-0000000000c1'); set local role authenticated;
+  begin perform public.submit_first_night_update(v_m, 'calm', 'playful'); raise exception 'expected NOT_STARTED';
+  exception when others then assert sqlerrm = 'NOT_STARTED', sqlerrm; end;
+  reset role; perform pg_temp.act('00000000-0000-0000-0000-0000000000a1'); set local role authenticated;
+  v_code := public.get_dropoff_code(v_m);
+  reset role; perform pg_temp.act('00000000-0000-0000-0000-0000000000c1'); set local role authenticated;
+  perform public.enter_dropoff_code(v_m, v_code);
+  v_before := (select paw_points from public.sitter_profiles where id = auth.uid());
+  perform public.submit_first_night_update(v_m, 'calm', 'playful', 'Nuit parfaite');
+  assert (select paw_points from public.sitter_profiles where id = auth.uid()) = v_before + 5, 'reward credited';
+  begin perform public.submit_first_night_update(v_m, 'calm', 'playful'); raise exception 'expected ALREADY_SENT';
+  exception when others then assert sqlerrm = 'ALREADY_SENT', sqlerrm; end;
+  reset role; perform pg_temp.act('00000000-0000-0000-0000-0000000000a1'); set local role authenticated;
+  assert (select night from public.first_night_reports where mission_id = v_m) = 'calm', 'owner reads the report';
+  reset role;
+  raise notice 'first night update: only after the hand-over, once per mission, rewarded with Paw Points';
+end $$;
 drop owned by chat_tester;
 drop role chat_tester;
 drop table public._c;
