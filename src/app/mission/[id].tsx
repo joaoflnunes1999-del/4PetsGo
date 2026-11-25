@@ -7,7 +7,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ChatBubble, SystemChip } from '@/components/chat/ChatBubble';
 import { ChatInputBar } from '@/components/chat/ChatInputBar';
-import { DropoffCodeEntry } from '@/components/chat/DropoffCodeEntry';
+import { MissionCodes } from '@/components/chat/MissionCodes';
+import { OwnerAvatar } from '@/components/owners/OwnerAvatar';
 import { FirstNightCard, FirstNightForm } from '@/components/chat/FirstNightCard';
 import { SitterAvatar } from '@/components/sitters/SitterAvatar';
 import { Button, EmptyState, Icon, Screen, Sheet, Text } from '@/components/ui';
@@ -37,6 +38,9 @@ export default function MissionChatScreen() {
   const { sendChatMessage, sendChatFile, answerFirstNight } = useAppStore.getState();
   const [codesOpen, setCodesOpen] = useState(false);
   const [fnuOpen, setFnuOpen] = useState(false);
+  /** Dev-only: look at the same chat as the owner or as the sitter. */
+  const [viewAs, setViewAs] = useState<ChatParty>();
+  const owner = useAppStore((s) => s.owner);
   const scrollRef = useRef<ComponentRef<typeof ScrollView>>(null);
   const count = chat?.messages.length ?? 0;
   const fnuStatus = chat?.firstNight.status;
@@ -55,7 +59,11 @@ export default function MissionChatScreen() {
     );
   }
 
-  const me: ChatParty = role === 'sitter' ? 'sitter' : 'owner';
+  const me: ChatParty = viewAs ?? (role === 'sitter' ? 'sitter' : 'owner');
+  const ownerName = owner?.firstName ?? 'Le propriétaire';
+  const endDate = new Date(`${request.startDate}T12:00:00`);
+  endDate.setDate(endDate.getDate() + (request.service === 'dogWalking' ? 0 : request.days - 1));
+  const isLastDay = new Date().setHours(23, 59, 59, 999) >= endDate.getTime();
   const finishDropoff = (code: string) => {
     const r = useAppStore.getState().enterDropoffCode(id, code);
     if (r === 'started') setCodesOpen(false);
@@ -85,10 +93,10 @@ export default function MissionChatScreen() {
         <Pressable accessibilityRole="button" accessibilityLabel="Retour" hitSlop={layout.hitSlop} onPress={() => router.back()}>
           <Icon name="chevron-left" size={26} />
         </Pressable>
-        <SitterAvatar sitter={sitter} size={38} />
+        {me === 'owner' ? <SitterAvatar sitter={sitter} size={38} /> : owner ? <OwnerAvatar owner={owner} size={38} /> : null}
         <View style={styles.flex}>
           <Text variant="title" numberOfLines={1}>
-            {sitter.firstName}
+            {me === 'owner' ? sitter.firstName : ownerName}
           </Text>
           <Text variant="caption" color="textMuted" numberOfLines={1}>
             {request.id} · {formatRange(request.startDate, request.service === 'dogWalking' ? 1 : request.days)}
@@ -101,6 +109,26 @@ export default function MissionChatScreen() {
           </Text>
         </Pressable>
       </View>
+
+      {__DEV__ ? (
+        <View style={styles.viewBar}>
+          <Text variant="label" color="info">
+            MODE DÉMO · VUE
+          </Text>
+          {(['owner', 'sitter'] as const).map((v) => (
+            <Pressable
+              key={v}
+              onPress={() => setViewAs(v)}
+              style={[styles.viewChip, me === v ? styles.viewChipOn : null]}
+              testID={`view-${v}`}
+              accessibilityRole="button">
+              <Text variant="badge" color={me === v ? 'textInverse' : 'info'}>
+                {v === 'owner' ? `Owner (${ownerName})` : `Pet Sitter (${sitter.firstName})`}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
+      ) : null}
 
       <ScrollView ref={scrollRef} style={styles.body} contentContainerStyle={styles.bodyContent} testID="chat-scroll">
         <SystemChip icon="lock" text="Messages et fichiers visibles uniquement par vous deux. Ils ne peuvent être ni modifiés ni supprimés." />
@@ -117,7 +145,7 @@ export default function MissionChatScreen() {
                 petName={petName}
                 sitterName={sitter.firstName}
                 viewer={me}
-                onAnswer={me === 'sitter' || __DEV__ ? () => setFnuOpen(true) : undefined}
+                onAnswer={me === 'sitter' ? () => setFnuOpen(true) : undefined}
               />
             );
           else content = <ChatBubble key={m.id} message={m} mine={m.from === me} />;
@@ -132,45 +160,25 @@ export default function MissionChatScreen() {
 
       <ChatInputBar onSend={(t) => sendChatMessage(id, me, t)} onAttach={attach} onCamera={camera} />
 
-      <Sheet visible={codesOpen} onClose={() => setCodesOpen(false)} title="Code de remise">
-        {chat.status !== 'confirmed' ? (
-          <View style={styles.codeBox}>
-            <Icon name="check-circle" size={28} color="success" />
-            <Text variant="body" align="center">
-              {petName} a été remis à {sitter.firstName}. La mission est en cours.
-            </Text>
-          </View>
-        ) : me === 'owner' ? (
-          <View style={styles.codeBox}>
-            <Text variant="caption" color="textMuted" align="center">
-              À donner à {sitter.firstName} au moment où vous lui confiez {petName}
-            </Text>
-            <Text style={styles.code} testID="dropoff-code">
-              {chat.dropoffCode.slice(0, 3)} {chat.dropoffCode.slice(3)}
-            </Text>
-            <View style={styles.disclaimer}>
-              <Icon name="alert-triangle" size={16} color="warning" />
-              <Text variant="caption" style={styles.flex}>
-                Ce code ne doit être donné qu’au moment de la remise de votre animal au Pet Sitter.
-              </Text>
-            </View>
-            {__DEV__ ? (
-              <View style={styles.demo}>
-                <Text variant="label" color="info">
-                  MODE DÉMO · SAISIR LE CODE EN TANT QUE {sitter.firstName.toUpperCase()}
-                </Text>
-                <DropoffCodeEntry onSubmit={(c) => finishDropoff(c)} testPrefix="demo-dropoff" />
-              </View>
-            ) : null}
-          </View>
-        ) : (
-          <View style={styles.codeBox}>
-            <Text variant="body" color="textMuted" align="center">
-              Saisissez le code que le propriétaire vous donne à la remise de l’animal.
-            </Text>
-            <DropoffCodeEntry onSubmit={(c) => finishDropoff(c)} />
-          </View>
-        )}
+      <Sheet visible={codesOpen} onClose={() => setCodesOpen(false)} title="Codes de la mission">
+        <MissionCodes
+          chat={chat}
+          me={me}
+          sitterName={sitter.firstName}
+          ownerName={ownerName}
+          petName={petName}
+          isLastDay={isLastDay}
+          onDropoff={finishDropoff}
+          onGeneratePickup={(reason) => {
+            const r = useAppStore.getState().generatePickupCode(id, reason);
+            return r.ok ? r.code : undefined;
+          }}
+          onPickup={(code) => {
+            const r = useAppStore.getState().enterPickupCode(id, code);
+            if (r === 'completed') setCodesOpen(false);
+            return r;
+          }}
+        />
         <Button label="Fermer" variant="ghost" onPress={() => setCodesOpen(false)} />
       </Sheet>
 
@@ -209,16 +217,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.brandTint,
   },
   body: { flex: 1 },
+  viewBar: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, paddingHorizontal: spacing.md, paddingVertical: spacing.xs + 2, backgroundColor: colors.infoSoft },
+  viewChip: { paddingHorizontal: spacing.sm, paddingVertical: spacing.xxs + 1, borderRadius: radius.pill, borderWidth: 1, borderColor: colors.info },
+  viewChipOn: { backgroundColor: colors.info },
   bodyContent: { paddingVertical: spacing.md, maxWidth: layout.maxContentWidth + 80, width: '100%', alignSelf: 'center' },
-  codeBox: { gap: spacing.md, alignItems: 'stretch' },
-  demo: { gap: spacing.sm, backgroundColor: colors.infoSoft, padding: spacing.md, borderRadius: radius.md },
-  code: { textAlign: 'center', fontSize: 40, lineHeight: 48, letterSpacing: 6, fontFamily: 'Inter_700Bold', color: colors.text },
-  disclaimer: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-    alignItems: 'flex-start',
-    backgroundColor: colors.warningSoft,
-    padding: spacing.md,
-    borderRadius: radius.md,
-  },
 });

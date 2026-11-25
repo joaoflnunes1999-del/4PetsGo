@@ -80,7 +80,7 @@ export function FirstNightCard({ update, petName, sitterName, viewer, onAnswer }
             <Text variant="callout" color="textMuted">
               {viewer === 'owner'
                 ? `Dès demain matin, ${sitterName} vous dira comment ${petName} a passé sa première nuit…`
-                : `Racontez au propriétaire comment ${petName} a passé sa première nuit. Deux questions, 30 secondes.`}
+                : `Racontez au propriétaire comment ${petName} a passé sa première nuit. Deux questions, 30 secondes, et jusqu’à 10 Paw Points.`}
             </Text>
             {onAnswer ? (
               <Button
