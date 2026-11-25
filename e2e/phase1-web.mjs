@@ -13,6 +13,8 @@ import path from 'node:path';
 const [fixtures, shots] = process.argv.slice(2);
 const BASE = process.env.BASE_URL ?? 'http://localhost:8081';
 const errors = [];
+let dropoff = '';
+let pickup = '';
 const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1 });
 page.on('pageerror', (e) => errors.push(`pageerror: ${e.message}`));
@@ -165,38 +167,45 @@ try {
     await page.getByText('CLÔTURÉE', { exact: true }).waitFor();
     await shot('mission-locked');
   });
-  await step('confirm mission → chat opens, no First Night Update before the hand-over', async () => {
+  await step('owner: confirm mission → chat opens, no First Night Update before the hand-over', async () => {
     await id('confirm-mission').click();
     await id('chat-input').waitFor();
     await page.getByText('Mission confirmée · le chat est ouvert').waitFor();
     if (await id('fnu-pending').count()) throw new Error('First Night Update must not exist before the hand-over');
     await id('chat-input').fill('Bonjour Inès ! Pistache adore sa balle bleue.');
     await id('chat-send').click();
-    await page.getByText('Pistache adore sa balle bleue').waitFor();
     const [chooser] = await Promise.all([page.waitForEvent('filechooser'), id('chat-attach').click()]);
     await chooser.setFiles(path.join(fixtures, 'ordonnance.pdf'));
     await page.getByText('ordonnance.pdf').waitFor();
-    await shot('chat-before-handover');
-  });
-  await step('hand-over: drop-off code → mission starts → First Night Update appears', async () => {
     await id('chat-codes').click();
-    const code = (await id('dropoff-code').innerText()).replace(/\s/g, '');
-    await page.getByText(/Ce code ne doit être donné qu’au moment de la remise/).waitFor();
+    dropoff = (await id('dropoff-code').innerText()).replace(/\s/g, '');
     await page.waitForTimeout(600);
-    await shot('chat-dropoff-code');
-    const wrong = code === '123456' ? '654321' : '123456';
-    await id('demo-dropoff-input').fill(wrong);
-    await id('demo-dropoff-submit').click();
+    await shot('owner-dropoff-code');
+    await page.getByRole('button', { name: 'Fermer', exact: true }).click();
+    await id('dropoff-code').waitFor({ state: 'detached' });
+  });
+  await step('sitter view: reply, then enter the drop-off code at hand-over', async () => {
+    await id('view-sitter').click();
+    await id('chat-input').fill('Avec plaisir Julie ! J’ai bien reçu l’ordonnance, je m’occupe de tout.');
+    await id('chat-send').click();
+    await page.getByText(/je m’occupe de tout/).waitFor();
+    await shot('sitter-chat-before-handover');
+    await id('chat-codes').click();
+    await id('dropoff-input').waitFor();
+    await page.waitForTimeout(600);
+    await shot('sitter-dropoff-entry');
+    await id('dropoff-input').fill(dropoff === '123456' ? '654321' : '123456');
+    await id('dropoff-submit').click();
     await page.getByText('Code incorrect.').waitFor();
-    await id('demo-dropoff-input').fill(code);
-    await id('demo-dropoff-submit').click();
+    await id('dropoff-input').fill(dropoff);
+    await id('dropoff-submit').click();
     await page.getByText('Pistache a été remis au Pet Sitter · mission commencée').waitFor();
     await id('fnu-pending').waitFor();
-    await page.getByText('Dès demain matin, Inès vous dira comment Pistache a passé sa première nuit…').waitFor();
+    await id('fnu-answer').waitFor();
     await page.waitForTimeout(400);
-    await shot('chat-fnu-pending');
+    await shot('sitter-fnu-pending');
   });
-  await step('First Night Update answered → green check + Paw Points reward in the corner', async () => {
+  await step('sitter view: First Night Update with reward hint → green check + 10 Paw Points', async () => {
     if (await id('fnu-reward').count()) throw new Error('no reward before the answer');
     await id('fnu-answer').click();
     await id('fnu-night-calm').click();
@@ -206,12 +215,32 @@ try {
     await id('fnu-comment').fill('Pistache a dormi toute la nuit au pied du lit, puis il a réclamé sa balle bleue dès sept heures du matin.');
     await id('fnu-reward-hint').getByText(/vous gagnerez 10 Paw Points/).waitFor();
     await page.waitForTimeout(300);
-    await shot('fnu-form-detailed');
+    await shot('sitter-fnu-form');
     await id('fnu-submit').click();
     await id('fnu-answered').waitFor();
     await id('fnu-reward').getByText('+10').waitFor();
     await page.waitForTimeout(400);
-    await shot('chat-fnu-answered');
+    await shot('sitter-fnu-answered');
+  });
+  await step('sitter view: generate the pick-up code (early end needs a reason)', async () => {
+    await id('chat-codes').click();
+    await id('pickup-reason-early_owner').click();
+    await id('pickup-generate').click();
+    pickup = (await id('pickup-code').innerText()).replace(/\s/g, '');
+    await page.waitForTimeout(600);
+    await shot('sitter-pickup-code');
+    await page.getByRole('button', { name: 'Fermer', exact: true }).click();
+    await id('pickup-code').waitFor({ state: 'detached' });
+  });
+  await step('owner view: type the pick-up code → mission completed', async () => {
+    await id('view-owner').click();
+    await page.getByText(/Code de fin de mission généré · Le propriétaire reprend son animal plus tôt/).waitFor();
+    await id('chat-codes').click();
+    await id('pickup-input').fill(pickup);
+    await id('pickup-submit').click();
+    await page.getByText('Animal récupéré · mission terminée').waitFor();
+    await page.waitForTimeout(400);
+    await shot('owner-chat-completed');
     await page.getByRole('button', { name: 'Retour' }).first().click();
     await id('open-chat').waitFor();
   });
