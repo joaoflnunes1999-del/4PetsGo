@@ -29,6 +29,8 @@ export type MissionChat = {
   requestId: string;
   status: 'confirmed' | 'in_progress';
   dropoffCode: string;
+  dropoffAttempts: number;
+  startedAt?: string;
   confirmedAt: string;
   messages: ChatMessage[];
   firstNight: FirstNightUpdate;

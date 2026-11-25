@@ -7,6 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ChatBubble, SystemChip } from '@/components/chat/ChatBubble';
 import { ChatInputBar } from '@/components/chat/ChatInputBar';
+import { DropoffCodeEntry } from '@/components/chat/DropoffCodeEntry';
 import { FirstNightCard, FirstNightForm } from '@/components/chat/FirstNightCard';
 import { SitterAvatar } from '@/components/sitters/SitterAvatar';
 import { Button, EmptyState, Icon, Screen, Sheet, Text } from '@/components/ui';
@@ -55,6 +56,11 @@ export default function MissionChatScreen() {
   }
 
   const me: ChatParty = role === 'sitter' ? 'sitter' : 'owner';
+  const finishDropoff = (code: string) => {
+    const r = useAppStore.getState().enterDropoffCode(id, code);
+    if (r === 'started') setCodesOpen(false);
+    return r;
+  };
   const petName = pets.filter((p) => request.petIds.includes(p.id)).map((p) => p.name).join(' & ') || 'votre animal';
 
   const attach = async () => {
@@ -127,7 +133,14 @@ export default function MissionChatScreen() {
       <ChatInputBar onSend={(t) => sendChatMessage(id, me, t)} onAttach={attach} onCamera={camera} />
 
       <Sheet visible={codesOpen} onClose={() => setCodesOpen(false)} title="Code de remise">
-        {me === 'owner' ? (
+        {chat.status !== 'confirmed' ? (
+          <View style={styles.codeBox}>
+            <Icon name="check-circle" size={28} color="success" />
+            <Text variant="body" align="center">
+              {petName} a été remis à {sitter.firstName}. La mission est en cours.
+            </Text>
+          </View>
+        ) : me === 'owner' ? (
           <View style={styles.codeBox}>
             <Text variant="caption" color="textMuted" align="center">
               À donner à {sitter.firstName} au moment où vous lui confiez {petName}
@@ -141,11 +154,22 @@ export default function MissionChatScreen() {
                 Ce code ne doit être donné qu’au moment de la remise de votre animal au Pet Sitter.
               </Text>
             </View>
+            {__DEV__ ? (
+              <View style={styles.demo}>
+                <Text variant="label" color="info">
+                  MODE DÉMO · SAISIR LE CODE EN TANT QUE {sitter.firstName.toUpperCase()}
+                </Text>
+                <DropoffCodeEntry onSubmit={(c) => finishDropoff(c)} testPrefix="demo-dropoff" />
+              </View>
+            ) : null}
           </View>
         ) : (
-          <Text variant="body" color="textMuted">
-            Saisissez le code que le propriétaire vous donne à la remise de l’animal.
-          </Text>
+          <View style={styles.codeBox}>
+            <Text variant="body" color="textMuted" align="center">
+              Saisissez le code que le propriétaire vous donne à la remise de l’animal.
+            </Text>
+            <DropoffCodeEntry onSubmit={(c) => finishDropoff(c)} />
+          </View>
         )}
         <Button label="Fermer" variant="ghost" onPress={() => setCodesOpen(false)} />
       </Sheet>
@@ -186,8 +210,9 @@ const styles = StyleSheet.create({
   },
   body: { flex: 1 },
   bodyContent: { paddingVertical: spacing.md, maxWidth: layout.maxContentWidth + 80, width: '100%', alignSelf: 'center' },
-  codeBox: { gap: spacing.md, alignItems: 'center' },
-  code: { fontSize: 40, lineHeight: 48, letterSpacing: 6, fontFamily: 'Inter_700Bold', color: colors.text },
+  codeBox: { gap: spacing.md, alignItems: 'stretch' },
+  demo: { gap: spacing.sm, backgroundColor: colors.infoSoft, padding: spacing.md, borderRadius: radius.md },
+  code: { textAlign: 'center', fontSize: 40, lineHeight: 48, letterSpacing: 6, fontFamily: 'Inter_700Bold', color: colors.text },
   disclaimer: {
     flexDirection: 'row',
     gap: spacing.sm,

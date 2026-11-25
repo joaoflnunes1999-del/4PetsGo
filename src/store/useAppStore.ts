@@ -80,6 +80,8 @@ type Actions = {
   sendChatMessage: (requestId: string, from: ChatParty, body: string) => void;
   sendChatFile: (requestId: string, from: ChatParty, file: ChatFile) => void;
   answerFirstNight: (requestId: string, answer: Pick<FirstNightUpdate, 'night' | 'morning' | 'comment' | 'photo'>) => Result;
+  /** Sitter types the drop-off code at hand-over → mission starts; the First Night Update appears only then. */
+  enterDropoffCode: (requestId: string, code: string) => 'started' | 'invalid' | 'locked_out';
   resetAll: () => void;
 };
 
@@ -214,15 +216,45 @@ export const useAppStore = create<State & Actions>()(
           requestId,
           status: 'confirmed',
           dropoffCode: String(Math.floor(Math.random() * 1_000_000)).padStart(6, '0'),
+          dropoffAttempts: 0,
           confirmedAt: now,
           messages: [
             { id: newId('msg'), from: 'system', kind: 'event', body: 'Mission confirmée · le chat est ouvert', createdAt: now },
-            { id: newId('msg'), from: 'system', kind: 'firstNight', createdAt: now },
           ],
           firstNight: { status: 'pending', rewardPoints: PAW_REWARDS.firstNightUpdate },
         };
         set((s) => ({ chats: { ...s.chats, [requestId]: chat } }));
         return { ok: true };
+      },
+
+      enterDropoffCode: (requestId, code) => {
+        const chat = get().chats[requestId];
+        if (!chat || chat.status !== 'confirmed') return 'invalid';
+        if (chat.dropoffAttempts >= 5) return 'locked_out';
+        if (code.replace(/\s/g, '') !== chat.dropoffCode) {
+          set((s) => ({ chats: { ...s.chats, [requestId]: { ...chat, dropoffAttempts: chat.dropoffAttempts + 1 } } }));
+          return chat.dropoffAttempts + 1 >= 5 ? 'locked_out' : 'invalid';
+        }
+        const now = new Date().toISOString();
+        const pets = get().pets.filter((p) => get().requests.find((r) => r.id === requestId)?.petIds.includes(p.id));
+        const petName = pets.map((p) => p.name).join(' & ') || 'L’animal';
+        set((s) => ({
+          chats: {
+            ...s.chats,
+            [requestId]: {
+              ...chat,
+              status: 'in_progress',
+              startedAt: now,
+              messages: [
+                ...chat.messages,
+                { id: newId('msg'), from: 'system', kind: 'event', body: `${petName} a été remis au Pet Sitter · mission commencée`, createdAt: now },
+                // The First Night Update only exists once the pet has been handed over.
+                { id: newId('msg'), from: 'system', kind: 'firstNight', createdAt: now },
+              ],
+            },
+          },
+        }));
+        return 'started';
       },
 
       // Messages are append-only: there is deliberately no edit/delete action (founder rule).
@@ -248,6 +280,7 @@ export const useAppStore = create<State & Actions>()(
       answerFirstNight: (requestId, answer) => {
         const chat = get().chats[requestId];
         if (!chat) return { ok: false, error: 'Chat introuvable.' };
+        if (chat.status !== 'in_progress') return { ok: false, error: 'Le First Night Update arrive après la remise de l’animal.' };
         if (chat.firstNight.status === 'answered') return { ok: false, error: 'Le First Night Update a déjà été envoyé.' };
         if (!answer.night || !answer.morning) return { ok: false, error: 'Répondez aux deux questions.' };
         const now = new Date().toISOString();
