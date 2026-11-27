@@ -4,7 +4,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { Button, Icon, Input, Text } from '@/components/ui';
 import type { ChatParty, MissionChat } from '@/features/chat/types';
 import { REVIEW_CRITERIA, REVIEW_PUBLISH_DAYS } from '@/features/reviews/criteria';
-import { colors, radius, spacing } from '@/theme';
+import { colors, radius, shadow, spacing } from '@/theme';
 
 export function Stars({ value, size = 16 }: { value: number; size?: number }) {
   return (
@@ -112,7 +112,7 @@ export function ReviewForm({ role, otherName, onSubmit }: { role: ChatParty; oth
 
 const styles = StyleSheet.create({
   wrap: { paddingHorizontal: spacing.md, marginVertical: spacing.sm, alignItems: 'center' },
-  card: { width: '100%', maxWidth: 420, backgroundColor: colors.surface, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.border, padding: spacing.lg, gap: spacing.md },
+  card: { width: '100%', maxWidth: 420, backgroundColor: colors.surface, borderRadius: radius.lg, ...shadow.card, padding: spacing.lg, gap: spacing.md },
   head: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
   icon: { width: 40, height: 40, borderRadius: radius.pill, backgroundColor: colors.accentSoft, alignItems: 'center', justifyContent: 'center' },
   flex: { flex: 1 },

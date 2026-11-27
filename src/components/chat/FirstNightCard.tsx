@@ -7,7 +7,7 @@ import { Button, Chip, Icon, Input, Text } from '@/components/ui';
 import { formatTime } from '@/features/chat/format';
 import { FIRST_NIGHT_REWARD, countWords, firstNightReward } from '@/features/levels/levels';
 import { MORNING_LABELS, NIGHT_LABELS, type FirstNightUpdate, type MorningAnswer, type NightAnswer } from '@/features/chat/types';
-import { colors, radius, spacing } from '@/theme';
+import { colors, radius, shadow, spacing } from '@/theme';
 
 type Props = {
   update: FirstNightUpdate;
@@ -178,7 +178,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     borderRadius: radius.lg,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: 'transparent',
+    ...shadow.card,
     padding: spacing.lg,
     gap: spacing.md,
   },

@@ -166,5 +166,5 @@ const styles = StyleSheet.create({
   code: { textAlign: 'center', fontSize: 40, lineHeight: 48, letterSpacing: 6, fontFamily: 'Inter_700Bold', color: colors.text },
   warning: { flexDirection: 'row', gap: spacing.sm, alignItems: 'flex-start', backgroundColor: colors.warningSoft, padding: spacing.md, borderRadius: radius.md },
   option: { padding: spacing.md, borderRadius: radius.md, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface, gap: 2 },
-  optionOn: { borderColor: colors.selectedBorder, backgroundColor: colors.selected },
+  optionOn: { borderColor: colors.action, backgroundColor: colors.brandTint },
 });

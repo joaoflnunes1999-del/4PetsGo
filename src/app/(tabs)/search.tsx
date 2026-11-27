@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
 import { SitterCard } from '@/components/sitters/SitterCard';
-import { Button, Chip, EmptyState, Screen, SegmentedTabs, Stepper, Text } from '@/components/ui';
+import { Button, Chip, EmptyState, Screen, Stepper, Text } from '@/components/ui';
 import type { ServiceType } from '@/domain/types';
 import { petSizes } from '@/features/booking/requestPricing';
 import { getCity } from '@/features/sitters/cities';
@@ -13,9 +13,9 @@ import { useSearchStore } from '@/store/useSearchStore';
 import { spacing } from '@/theme';
 
 const SERVICE_TABS = [
-  { value: 'boarding', label: 'Garde' },
-  { value: 'homeVisits', label: 'Visites' },
-  { value: 'dogWalking', label: 'Promenade' },
+  { value: 'boarding', label: 'Garde', icon: 'home' },
+  { value: 'homeVisits', label: 'Visite', icon: 'key' },
+  { value: 'dogWalking', label: 'Promenade', icon: 'mci:walk' },
 ] as const;
 
 const SERVICE_HINT: Record<ServiceType, string> = {
@@ -85,7 +85,18 @@ export default function SearchTab() {
       <Text variant="displayL" style={styles.title}>
         Rechercher
       </Text>
-      <SegmentedTabs options={SERVICE_TABS} value={service} onChange={(v) => set({ service: v })} />
+      <View style={styles.serviceRow}>
+        {SERVICE_TABS.map((t) => (
+          <Chip
+            key={t.value}
+            label={t.label}
+            icon={t.icon}
+            selected={service === t.value}
+            onPress={() => set({ service: t.value })}
+            testID={`search-service-${t.value}`}
+          />
+        ))}
+      </View>
       <Text variant="caption" color="textMuted">
         {SERVICE_HINT[service]}
       </Text>
@@ -162,6 +173,7 @@ export default function SearchTab() {
 const styles = StyleSheet.create({
   title: { paddingTop: spacing.md },
   block: { gap: spacing.sm },
+  serviceRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   dateRow: { flexDirection: 'row', gap: spacing.sm },
   resultsTitle: { marginTop: spacing.md },

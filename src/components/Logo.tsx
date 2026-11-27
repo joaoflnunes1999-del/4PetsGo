@@ -23,5 +23,5 @@ const styles = StyleSheet.create({
   wrap: { alignItems: 'center' },
   word: { fontFamily: fontFamily.displayBold, letterSpacing: -0.5 },
   forest: { color: colors.text },
-  leaf: { color: palette.sage[500] },
+  leaf: { color: palette.forest[700] },
 });

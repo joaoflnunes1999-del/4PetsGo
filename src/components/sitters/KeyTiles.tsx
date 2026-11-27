@@ -2,7 +2,7 @@ import { StyleSheet, View } from 'react-native';
 
 import { Icon, Text } from '@/components/ui';
 import type { KeyTile } from '@/features/sitters/facts';
-import { colors, radius, spacing } from '@/theme';
+import { colors, radius, shadow, spacing } from '@/theme';
 
 /** One row of 4 compact rectangles: icon + short value, no labels (details in accessibility labels). */
 export function KeyTiles({ tiles }: { tiles: KeyTile[] }) {
@@ -25,10 +25,9 @@ const styles = StyleSheet.create({
   tile: {
     flex: 1,
     height: 76,
-    borderRadius: radius.md,
+    borderRadius: radius.lg,
     backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
+    ...shadow.card,
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing.xs + 2,

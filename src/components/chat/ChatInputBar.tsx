@@ -68,6 +68,6 @@ const styles = StyleSheet.create({
     minHeight: 46,
   },
   input: { flex: 1, ...typography.body, color: colors.text, paddingVertical: spacing.sm, maxHeight: 120 },
-  send: { width: 46, height: 46, borderRadius: radius.pill, backgroundColor: colors.action, alignItems: 'center', justifyContent: 'center' },
+  send: { width: 46, height: 46, borderRadius: radius.pill, backgroundColor: colors.sendButton, alignItems: 'center', justifyContent: 'center' },
   sendIdle: { opacity: 0.55 },
 });

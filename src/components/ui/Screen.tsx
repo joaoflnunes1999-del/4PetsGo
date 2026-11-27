@@ -77,8 +77,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: spacing.sm,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: colors.border,
     marginBottom: spacing.sm,
   },
   headerSide: { width: 72, flexDirection: 'row', alignItems: 'center' },

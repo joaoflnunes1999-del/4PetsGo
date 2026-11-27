@@ -15,7 +15,7 @@ import { distanceKm, formatDistance } from '@/features/sitters/geo';
 import { NEW_SITTER_BOOST_MISSIONS } from '@/features/sitters/ranking';
 import { findSitter, useAppStore } from '@/store/useAppStore';
 import { useSearchStore } from '@/store/useSearchStore';
-import { colors, radius, spacing } from '@/theme';
+import { colors, layout, radius, spacing } from '@/theme';
 
 /**
  * Public sitter profile. Order (founder's request): identity (name, age, city) → 4 key tiles
@@ -73,8 +73,18 @@ export default function SitterProfileScreen() {
         ) : undefined
       }>
       <View style={styles.hero}>
-        <SitterAvatar sitter={sitter} size={92} />
-        <Text variant="displayM">{sitter.firstName}</Text>
+        <View style={styles.heroBand} />
+        <View style={styles.avatarRing}>
+          <SitterAvatar sitter={sitter} size={96} />
+        </View>
+        <View style={styles.nameRow}>
+          <Text variant="displayM">{sitter.firstName}</Text>
+          {sitter.identityVerified ? (
+            <View style={styles.verified} accessibilityLabel="Identité vérifiée">
+              <Icon name="check" size={12} color="textInverse" />
+            </View>
+          ) : null}
+        </View>
         <Text variant="callout" color="textMuted">
           {sitter.age} ans · {city.name}
           {dist != null ? ` · ${formatDistance(dist)}` : ''}
@@ -178,7 +188,20 @@ export default function SitterProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-  hero: { alignItems: 'center', gap: spacing.sm, paddingTop: spacing.sm },
+  hero: { alignItems: 'center', gap: spacing.sm, paddingTop: spacing.xl },
+  heroBand: {
+    position: 'absolute',
+    top: 0,
+    left: -layout.screenPadding,
+    right: -layout.screenPadding,
+    height: 92,
+    backgroundColor: colors.brandSurface,
+    borderBottomLeftRadius: radius.xl,
+    borderBottomRightRadius: radius.xl,
+  },
+  avatarRing: { padding: 4, borderRadius: radius.pill, backgroundColor: colors.background },
+  nameRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  verified: { width: 20, height: 20, borderRadius: radius.pill, backgroundColor: colors.success, alignItems: 'center', justifyContent: 'center' },
   badges: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xs, justifyContent: 'center' },
   section: { gap: spacing.sm },
   service: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },

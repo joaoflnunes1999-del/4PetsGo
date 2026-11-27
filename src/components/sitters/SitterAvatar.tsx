@@ -7,10 +7,10 @@ import { palette } from '@/theme';
 
 /** Initials avatars stay within the brand palette (terracotta dominant, other tones for variety). */
 const TONES = [
+  [palette.forest[100], palette.forest[700]],
   [palette.terracotta[100], palette.terracotta[700]],
-  [palette.sand[300], palette.clay[500]],
-  [palette.blue[100], palette.blue[700]],
-  [palette.sage[100], palette.sage[700]],
+  [palette.gold[100], palette.gold[700]],
+  [palette.sand[300], palette.charcoal[900]],
 ] as const;
 
 export function SitterAvatar({ sitter, size }: { sitter: SitterProfile; size: number }) {

@@ -81,8 +81,8 @@ export function Button({
 }
 
 const styles = StyleSheet.create({
-  base: { borderRadius: radius.md, alignItems: 'center', justifyContent: 'center' },
-  md: { minHeight: 48, paddingHorizontal: spacing.xl },
+  base: { borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center' },
+  md: { minHeight: 54, paddingHorizontal: spacing.xl },
   sm: { minHeight: 36, paddingHorizontal: spacing.md },
   full: { alignSelf: 'stretch' },
   auto: { alignSelf: 'flex-start' },

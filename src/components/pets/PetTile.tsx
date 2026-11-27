@@ -5,7 +5,7 @@ import type { PetProfile } from '@/domain/types';
 import { formatAge } from '@/features/pets/age';
 import { getBreed } from '@/features/pets/breeds';
 import { useAppStore } from '@/store/useAppStore';
-import { colors, radius, spacing } from '@/theme';
+import { colors, radius, shadow, spacing } from '@/theme';
 
 import { PetAvatar } from './PetAvatar';
 
@@ -68,8 +68,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: colors.surface,
     borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
+    ...shadow.card,
     paddingVertical: spacing.xl,
     paddingHorizontal: spacing.md,
   },
