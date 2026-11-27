@@ -110,6 +110,7 @@ try {
   await step('search: ranked eligible sitters for a 28 kg dog in Paris', async () => {
     await id('created-search').click();
     await page.getByText(/Pet Sitters? disponibles? près de Paris/).waitFor();
+    for (let i = 0; i < 4; i++) await page.getByRole('button', { name: 'Augmenter Nombre de jours' }).click(); // 7-day stay
     await id('sitter-card-sitter-ines').waitFor();
     // Camille & Léa do not accept large dogs → filtered out.
     if (await id('sitter-card-sitter-camille').count()) throw new Error('Camille should be filtered out');
@@ -222,6 +223,25 @@ try {
     await page.waitForTimeout(400);
     await shot('sitter-fnu-answered');
   });
+  await step('48 h photo reminders: upcoming → due → photo sent → next slot', async () => {
+    await id('photo-banner-calm').waitFor();
+    await page.getByText(/Prochaine photo à envoyer : jour 2/).waitFor();
+    await shot('photo-reminder-upcoming');
+    await id('demo-advance').click();
+    await id('demo-advance').click(); // +48 h
+    await id('photo-banner-due').waitFor();
+    await page.getByText(/Photo du jour 2 à envoyer avant/).waitFor();
+    await shot('photo-reminder-due');
+    const [chooser] = await Promise.all([page.waitForEvent('filechooser'), id('photo-banner-send').click()]);
+    await chooser.setFiles(path.join(fixtures, 'pet2.jpg'));
+    await page.getByText(/Prochaine photo à envoyer : jour 4/).waitFor();
+    await page.waitForTimeout(400);
+    await shot('photo-reminder-sent');
+    await id('view-owner').click();
+    await page.getByText(/Prochaine photo de Inès : jour 4/).waitFor();
+    await shot('photo-reminder-owner');
+    await id('view-sitter').click();
+  });
   await step('sitter view: generate the pick-up code (early end needs a reason)', async () => {
     await id('chat-codes').click();
     await id('pickup-reason-early_owner').click();
@@ -241,6 +261,31 @@ try {
     await page.getByText('Animal récupéré · mission terminée').waitFor();
     await page.waitForTimeout(400);
     await shot('owner-chat-completed');
+  });
+  await step('reviews: 4 criteria, hidden until both have reviewed', async () => {
+    await id('review-todo').waitFor();
+    await id('review-open').click();
+    await page.waitForTimeout(500);
+    for (const [k, v] of [['care', 5], ['communication', 5], ['punctuality', 4], ['overall', 5]]) await id(`review-${k}-${v}`).click();
+    await id('review-comment').fill('Inès a été parfaite, Pistache est rentré ravi !');
+    await shot('review-form-owner');
+    await id('review-submit').click();
+    await id('review-waiting').waitFor();
+    await page.getByText(/Il sera visible quand Inès aura donné le sien/).waitFor();
+    await id('review-submit').waitFor({ state: 'detached' });
+    await page.waitForTimeout(400);
+    await shot('review-waiting-owner');
+    await id('view-sitter').click();
+    await id('review-open').click();
+    await page.waitForTimeout(500);
+    for (const [k, v] of [['punctuality', 5], ['communication', 5], ['agreements', 5], ['handover', 5]]) await id(`review-${k}-${v}`).click();
+    await id('review-comment').fill('Julie avait tout préparé, un plaisir !');
+    await shot('review-form-sitter');
+    await id('review-submit').click();
+    await id('review-published').waitFor();
+    await page.getByText('« Inès a été parfaite, Pistache est rentré ravi ! »').waitFor();
+    await page.waitForTimeout(300);
+    await shot('review-published-sitter');
     await page.getByRole('button', { name: 'Retour' }).first().click();
     await id('open-chat').waitFor();
   });
