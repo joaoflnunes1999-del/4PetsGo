@@ -9,6 +9,7 @@ import { FEATURES } from '@/config/features';
 import { colors, fontFamily, layout, spacing } from '@/theme';
 
 const DOG_RATIO = 469 / 640;
+const LOGO_RATIO = 634 / 800;
 
 /** Entry screen, reproduced from the founder's reference mock-up (27/11/2026). */
 export default function Welcome() {
@@ -23,14 +24,12 @@ export default function Welcome() {
       <StatusBar style="dark" />
       <View style={[styles.top, { paddingTop: insets.top + spacing.xxl }]}>
         <Image
-          source={require('@/assets/images/welcome-house.png')}
-          style={{ width: w * 0.36, height: w * 0.36 }}
+          source={require('@/assets/images/logo-welcome.png')}
+          style={{ width: w * 0.8, height: w * 0.8 * LOGO_RATIO }}
           contentFit="contain"
-          accessibilityLabel="Logo 4PetsGo"
+          accessibilityRole="header"
+          accessibilityLabel="4PetsGo"
         />
-        <Text style={[styles.wordmark, { fontSize: w * 0.155, lineHeight: w * 0.18 }]} accessibilityRole="header">
-          4PetsGo
-        </Text>
         <Text style={styles.tagline}>Your Pet, their care,{'\n'}one place!</Text>
       </View>
 
@@ -60,7 +59,6 @@ export default function Welcome() {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.welcomeBackground },
   top: { flex: 1, alignItems: 'center', justifyContent: 'flex-end', gap: spacing.sm, paddingHorizontal: layout.screenPadding, paddingBottom: spacing.xl },
-  wordmark: { fontFamily: fontFamily.displayBold, color: colors.wordmark, letterSpacing: -1.5, textAlign: 'center' },
   tagline: { fontFamily: fontFamily.bodyMedium, fontSize: 20, lineHeight: 27, color: colors.wordmark, textAlign: 'center' },
   bottom: { alignItems: 'center' },
   dog: { zIndex: 2, marginBottom: -18 },
