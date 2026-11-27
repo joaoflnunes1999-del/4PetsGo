@@ -20,7 +20,7 @@ begin
   perform public.confirm_mission(v_m);
   v_code := public.get_dropoff_code(v_m);
   -- Reviewing before the end is refused.
-  begin perform public.submit_review(v_m, '{"care":5,"communication":5,"punctuality":5,"petCondition":5,"overall":5}');
+  begin perform public.submit_review(v_m, '{"care":5,"communication":5,"punctuality":5,"overall":5}');
     raise exception 'expected NOT_COMPLETED'; exception when others then assert sqlerrm = 'NOT_COMPLETED', sqlerrm; end;
   reset role; perform pg_temp.act('00000000-0000-0000-0000-0000000000c2'); set local role authenticated;
   perform public.enter_dropoff_code(v_m, v_code);
@@ -39,11 +39,11 @@ begin
   perform pg_temp.act('00000000-0000-0000-0000-0000000000a1'); set local role authenticated;
   begin perform public.submit_review(v_m, '{"care":5,"communication":4}');
     raise exception 'expected INVALID_CRITERIA'; exception when others then assert sqlerrm = 'INVALID_CRITERIA', sqlerrm; end;
-  begin perform public.submit_review(v_m, '{"care":9,"communication":4,"punctuality":4,"petCondition":5,"overall":5}');
+  begin perform public.submit_review(v_m, '{"care":9,"communication":4,"punctuality":4,"overall":5}');
     raise exception 'expected INVALID_CRITERIA'; exception when others then assert sqlerrm = 'INVALID_CRITERIA', sqlerrm; end;
-  perform public.submit_review(v_m, '{"care":5,"communication":4,"punctuality":4,"petCondition":5,"overall":5}', 'Super garde, merci Marc !');
+  perform public.submit_review(v_m, '{"care":5,"communication":4,"punctuality":4,"overall":5}', 'Super garde, merci Marc !');
   assert (select count(*) from public.reviews where mission_id = v_m) = 1, 'author sees her own review';
-  begin perform public.submit_review(v_m, '{"care":5,"communication":5,"punctuality":5,"petCondition":5,"overall":5}');
+  begin perform public.submit_review(v_m, '{"care":5,"communication":5,"punctuality":5,"overall":5}');
     raise exception 'expected ALREADY_REVIEWED'; exception when others then assert sqlerrm = 'ALREADY_REVIEWED', sqlerrm; end;
   reset role; perform pg_temp.act('00000000-0000-0000-0000-0000000000c2'); set local role authenticated;
   assert (select count(*) from public.reviews where mission_id = v_m) = 0, 'target cannot see it yet';
@@ -59,14 +59,14 @@ do $$
 declare v_m uuid := (select v::uuid from public._r where k = 'm');
 begin
   perform pg_temp.act('00000000-0000-0000-0000-0000000000c2'); set local role authenticated;
-  perform public.submit_review(v_m, '{"punctuality":5,"clarity":5,"communication":5,"agreements":5,"handover":4}');
+  perform public.submit_review(v_m, '{"punctuality":5,"communication":5,"agreements":5,"handover":4}');
   assert (select count(*) from public.reviews where mission_id = v_m) = 2, 'both visible once both reviewed';
   update public.reviews set rating = 1 where mission_id = v_m;
   delete from public.reviews where mission_id = v_m;
   reset role; perform pg_temp.act('00000000-0000-0000-0000-0000000000b2'); set local role authenticated;
   assert (select count(*) from public.reviews where mission_id = v_m) = 2, 'published reviews are public to members';
   reset role;
-  assert (select rating from public.sitter_profiles where id = '00000000-0000-0000-0000-0000000000c2') = 4.6, 'rating = average of criteria (23/5)';
+  assert (select rating from public.sitter_profiles where id = '00000000-0000-0000-0000-0000000000c2') = 4.5, 'rating = average of the 4 criteria (18/4)';
   assert (select review_count from public.sitter_profiles where id = '00000000-0000-0000-0000-0000000000c2') = 1;
   assert (select min(rating) from public.reviews where mission_id = v_m) > 1, 'reviews cannot be edited';
   raise notice 'reviews: published when both have reviewed, sitter rating refreshed, reviews cannot be edited or deleted';

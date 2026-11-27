@@ -1,5 +1,5 @@
 -- 4PetsGo — bilateral reviews (PRD §3.11).
---  * Only after a mission really completed (pick-up code entered), once per party.
+--  * Only after a mission really completed (pick-up code entered), once per party, 4 criteria rated 1–5.
 --  * Hidden until BOTH parties have reviewed, or 14 days after the end (limits retaliation).
 --  * Published reviews are readable by signed-in users (sitter reputation is public).
 --  * The sitter's rating is the average of published reviews written by owners. No automatic suspension.
@@ -10,8 +10,8 @@ create table public.reviews (
   author_id uuid references public.profiles (id) on delete set null,
   target_id uuid references public.profiles (id) on delete cascade,
   author_role text not null check (author_role in ('owner', 'sitter')),
-  -- owner → sitter: care, communication, punctuality, petCondition, overall
-  -- sitter → owner: punctuality, clarity, communication, agreements, handover
+  -- owner → sitter: care, communication, punctuality, overall (founder 27/11/2026)
+  -- sitter → owner: punctuality, communication, agreements, handover
   criteria jsonb not null,
   rating numeric(2, 1) not null check (rating between 1 and 5),
   comment text check (char_length(comment) <= 1000),
@@ -81,8 +81,8 @@ begin
   end if;
 
   v_keys := case when v_role = 'owner'
-    then array['care', 'communication', 'punctuality', 'petCondition', 'overall']
-    else array['punctuality', 'clarity', 'communication', 'agreements', 'handover'] end;
+    then array['care', 'communication', 'punctuality', 'overall']
+    else array['punctuality', 'communication', 'agreements', 'handover'] end;
   if p_criteria is null or (select count(*) from jsonb_object_keys(p_criteria)) <> cardinality(v_keys) then
     raise exception 'INVALID_CRITERIA';
   end if;
