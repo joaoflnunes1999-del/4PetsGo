@@ -24,10 +24,12 @@ export const palette = {
   forest: {
     50: '#F0F5ED',
     100: '#DFE9D8', // sage surfaces: welcome, banners, own chat bubbles, "confirmed" pills
+    150: '#CDD8C4', // welcome / sign-in background (reference mock-up)
     200: '#C5D6BE',
     500: '#5E8467',
     700: '#3F6A4F', // brand green: icons, send button, verified check, positive text
     800: '#2F5340',
+    900: '#1C2E2B', // wordmark on the welcome screen
   },
   cream: '#F6F1EA', // app background
   card: '#FFFDFA', // cards (soft cream white)
@@ -75,8 +77,11 @@ export const colors = {
   brand: palette.terracotta[500],
   brandText: palette.terracotta[700],
   brandTint: palette.terracotta[50],
-  /** Calm brand surfaces (welcome, banners). */
+  /** Calm brand surfaces (banners, sitter hero). */
   brandSurface: palette.forest[100],
+  /** Welcome / sign-in screen. */
+  welcomeBackground: palette.forest[150],
+  wordmark: palette.forest[900],
   /** Active filter chip: filled terracotta, white label. */
   selected: palette.terracotta[500],
   selectedBorder: palette.terracotta[500],

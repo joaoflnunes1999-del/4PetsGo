@@ -1,73 +1,71 @@
+import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Logo } from '@/components/Logo';
-import { Button, Icon, Text, type IconName } from '@/components/ui';
-import { colors, layout, radius, shadow, spacing } from '@/theme';
+import { Button, Text } from '@/components/ui';
+import { FEATURES } from '@/config/features';
+import { colors, fontFamily, layout, spacing } from '@/theme';
 
-const PILLARS: { icon: IconName; title: string; body: string }[] = [
-  { icon: 'mci:paw', title: 'Un profil pour chaque animal', body: 'Photos, habitudes et soins réunis au même endroit.' },
-  { icon: 'repeat', title: 'Un prix juste, négocié', body: 'Une demande, plusieurs Pet Sitters, un accord en 3 échanges.' },
-  { icon: 'shield', title: 'La confiance d’abord', body: 'Niveaux, Paw Points et avis vérifiés après chaque mission.' },
-];
+const DOG_RATIO = 469 / 640;
 
+/** Entry screen, reproduced from the founder's reference mock-up (27/11/2026). */
 export default function Welcome() {
   const insets = useSafeAreaInsets();
+  const { width } = useWindowDimensions();
+  const w = Math.min(width, layout.maxContentWidth + 40);
+  const dogWidth = w * 0.72;
+  const arc = w * 1.9;
+
   return (
     <View style={styles.root}>
       <StatusBar style="dark" />
-      <View style={[styles.hero, { paddingTop: insets.top + spacing.xxxl }]}>
-        <Logo size={170} />
-        <Text variant="title" align="center" style={styles.tagline}>
-          Your Pet, their care,{'\n'}one place!
+      <View style={[styles.top, { paddingTop: insets.top + spacing.xxl }]}>
+        <Image
+          source={require('@/assets/images/welcome-house.png')}
+          style={{ width: w * 0.36, height: w * 0.36 }}
+          contentFit="contain"
+          accessibilityLabel="Logo 4PetsGo"
+        />
+        <Text style={[styles.wordmark, { fontSize: w * 0.155, lineHeight: w * 0.18 }]} accessibilityRole="header">
+          4PetsGo
         </Text>
+        <Text style={styles.tagline}>Your Pet, their care,{'\n'}one place!</Text>
       </View>
-      <View style={[styles.panel, { paddingBottom: Math.max(insets.bottom, spacing.lg) }]}>
-        <View style={styles.pillars}>
-          {PILLARS.map((p) => (
-            <View key={p.title} style={styles.pillar}>
-              <View style={styles.pillarIcon}>
-                <Icon name={p.icon} size={20} color="primary" />
-              </View>
-              <View style={styles.pillarText}>
-                <Text variant="bodyStrong">{p.title}</Text>
-                <Text variant="caption" color="textMuted">
-                  {p.body}
-                </Text>
-              </View>
-            </View>
-          ))}
+
+      <View style={styles.bottom}>
+        <Image
+          source={require('@/assets/images/welcome-dog.png')}
+          style={[styles.dog, { width: dogWidth, height: dogWidth * DOG_RATIO }]}
+          contentFit="contain"
+          accessibilityLabel="Un bouledogue français"
+        />
+        <View style={[styles.arcWrap, { paddingBottom: Math.max(insets.bottom, spacing.lg) }]}>
+          <View style={[styles.arc, { width: arc, height: arc, borderRadius: arc / 2, left: (width - arc) / 2 }]} />
+          <View style={styles.actions}>
+            <Button label="Commencer" onPress={() => router.push('/onboarding/role')} testID="welcome-start" />
+            {FEATURES.accountSignIn ? (
+              <Pressable accessibilityRole="button" style={styles.signIn} testID="welcome-sign-in">
+                <Text variant="bodyStrong">Se connecter</Text>
+              </Pressable>
+            ) : null}
+          </View>
         </View>
-        <Button label="Commencer" onPress={() => router.push('/onboarding/role')} testID="welcome-start" />
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.brandSurface },
-  hero: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing.md, paddingHorizontal: layout.screenPadding },
-  tagline: { fontSize: 20, lineHeight: 27, color: colors.text },
-  panel: {
-    backgroundColor: colors.background,
-    borderTopLeftRadius: radius.xl + 4,
-    borderTopRightRadius: radius.xl + 4,
-    paddingHorizontal: layout.screenPadding,
-    paddingTop: spacing.xxl,
-    gap: spacing.xl,
-    ...shadow.floating,
-  },
-  pillars: { gap: spacing.lg, width: '100%', maxWidth: layout.maxContentWidth, alignSelf: 'center' },
-  pillar: { flexDirection: 'row', gap: spacing.md, alignItems: 'center' },
-  pillarIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: radius.md,
-    backgroundColor: colors.brandSurface,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  pillarText: { flex: 1, gap: 2 },
+  root: { flex: 1, backgroundColor: colors.welcomeBackground },
+  top: { flex: 1, alignItems: 'center', justifyContent: 'flex-end', gap: spacing.sm, paddingHorizontal: layout.screenPadding, paddingBottom: spacing.xl },
+  wordmark: { fontFamily: fontFamily.displayBold, color: colors.wordmark, letterSpacing: -1.5, textAlign: 'center' },
+  tagline: { fontFamily: fontFamily.bodyMedium, fontSize: 20, lineHeight: 27, color: colors.wordmark, textAlign: 'center' },
+  bottom: { alignItems: 'center' },
+  dog: { zIndex: 2, marginBottom: -18 },
+  arcWrap: { width: '100%', paddingTop: spacing.xxxl + spacing.sm, overflow: 'hidden', minHeight: 150 },
+  arc: { position: 'absolute', top: 0, backgroundColor: colors.background },
+  actions: { paddingHorizontal: layout.screenPadding + spacing.sm, gap: spacing.md, width: '100%', maxWidth: layout.maxContentWidth, alignSelf: 'center' },
+  signIn: { alignSelf: 'center', paddingVertical: spacing.sm },
 });
