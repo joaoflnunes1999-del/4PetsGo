@@ -8,6 +8,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ChatBubble, SystemChip } from '@/components/chat/ChatBubble';
 import { ChatInputBar } from '@/components/chat/ChatInputBar';
 import { MissionCodes } from '@/components/chat/MissionCodes';
+import { PhotoReminderBanner } from '@/components/chat/PhotoReminderBanner';
+import { ReviewCard, ReviewForm } from '@/components/chat/ReviewCard';
 import { OwnerAvatar } from '@/components/owners/OwnerAvatar';
 import { FirstNightCard, FirstNightForm } from '@/components/chat/FirstNightCard';
 import { SitterAvatar } from '@/components/sitters/SitterAvatar';
@@ -38,6 +40,7 @@ export default function MissionChatScreen() {
   const { sendChatMessage, sendChatFile, answerFirstNight } = useAppStore.getState();
   const [codesOpen, setCodesOpen] = useState(false);
   const [fnuOpen, setFnuOpen] = useState(false);
+  const [reviewOpen, setReviewOpen] = useState(false);
   /** Dev-only: look at the same chat as the owner or as the sitter. */
   const [viewAs, setViewAs] = useState<ChatParty>();
   const owner = useAppStore((s) => s.owner);
@@ -48,7 +51,7 @@ export default function MissionChatScreen() {
   useEffect(() => {
     const t = setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 50);
     return () => clearTimeout(t);
-  }, [count, fnuStatus]);
+  }, [count, fnuStatus, chat?.status, chat?.reviews]);
 
   const sitter = request?.lockedSitterId ? findSitter(request.lockedSitterId, mySitter) : undefined;
   if (!request || !chat || !sitter) {
@@ -77,6 +80,12 @@ export default function MissionChatScreen() {
     const a = res.assets[0];
     if (a.size && a.size > 20 * 1024 * 1024) return;
     sendChatFile(id, me, { name: a.name, mime: a.mimeType ?? 'application/octet-stream', uri: a.uri, size: a.size });
+  };
+  const sendPhoto = async () => {
+    const res = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.7 });
+    if (res.canceled || !res.assets?.length) return;
+    const a = res.assets[0];
+    sendChatFile(id, me, { name: a.fileName ?? 'photo.jpg', mime: a.mimeType ?? 'image/jpeg', uri: a.uri, size: a.fileSize, width: a.width, height: a.height });
   };
   const camera = async () => {
     const perm = await ImagePicker.requestCameraPermissionsAsync();
@@ -127,8 +136,17 @@ export default function MissionChatScreen() {
               </Text>
             </Pressable>
           ))}
+          {chat.status === 'in_progress' ? (
+            <Pressable onPress={() => useAppStore.getState().advanceDemoClock(id, 24)} style={styles.viewChip} testID="demo-advance" accessibilityRole="button">
+              <Text variant="badge" color="info">
+                +24 h
+              </Text>
+            </Pressable>
+          ) : null}
         </View>
       ) : null}
+
+      <PhotoReminderBanner chat={chat} days={request.days} me={me} sitterName={sitter.firstName} onSendPhoto={sendPhoto} />
 
       <ScrollView ref={scrollRef} style={styles.body} contentContainerStyle={styles.bodyContent} testID="chat-scroll">
         <SystemChip icon="lock" text="Messages et fichiers visibles uniquement par vous deux. Ils ne peuvent être ni modifiés ni supprimés." />
@@ -156,6 +174,9 @@ export default function MissionChatScreen() {
             </View>
           );
         })}
+        {chat.status === 'completed' ? (
+          <ReviewCard chat={chat} me={me} otherName={me === 'owner' ? sitter.firstName : ownerName} onReview={() => setReviewOpen(true)} />
+        ) : null}
       </ScrollView>
 
       <ChatInputBar onSend={(t) => sendChatMessage(id, me, t)} onAttach={attach} onCamera={camera} />
@@ -180,6 +201,16 @@ export default function MissionChatScreen() {
           }}
         />
         <Button label="Fermer" variant="ghost" onPress={() => setCodesOpen(false)} />
+      </Sheet>
+
+      <Sheet visible={reviewOpen} onClose={() => setReviewOpen(false)} title="Votre avis">
+        <ReviewForm
+          role={me}
+          otherName={me === 'owner' ? sitter.firstName : ownerName}
+          onSubmit={(criteria, comment) => {
+            if (useAppStore.getState().submitReview(id, me, criteria, comment).ok) setReviewOpen(false);
+          }}
+        />
       </Sheet>
 
       <Sheet visible={fnuOpen} onClose={() => setFnuOpen(false)} title="First Night Update">
