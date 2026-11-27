@@ -22,8 +22,9 @@ import {
   respond,
   type NegotiationAction,
 } from '@/features/booking/negotiation';
-import { PICKUP_REASON_LABELS, type ChatFile, type ChatMessage, type ChatParty, type FirstNightUpdate, type MissionChat, type PickupReason } from '@/features/chat/types';
+import { PICKUP_REASON_LABELS, type ChatFile, type ChatMessage, type ChatParty, type FirstNightUpdate, type LocalReview, type MissionChat, type PickupReason } from '@/features/chat/types';
 import { firstNightReward } from '@/features/levels/levels';
+import { reviewRating } from '@/features/reviews/criteria';
 import { getCity } from '@/features/sitters/cities';
 import { DEMO_SITTERS } from '@/features/sitters/demoSitters';
 
@@ -82,12 +83,19 @@ type Actions = {
   answerFirstNight: (requestId: string, answer: Pick<FirstNightUpdate, 'night' | 'morning' | 'comment' | 'photo'>) => Result;
   /** Sitter generates the pick-up code (always available while in progress). Early end needs a reason. */
   generatePickupCode: (requestId: string, reason?: PickupReason) => { ok: true; code: string } | { ok: false; error: string };
+  /** Dev-only: move the demo clock forward to show the 48 h photo reminders. */
+  advanceDemoClock: (requestId: string, hours: number) => void;
+  /** Bilateral review after completion (4 criteria, 1–5). */
+  submitReview: (requestId: string, role: ChatParty, criteria: Record<string, number>, comment?: string) => Result;
   /** Owner types the pick-up code → mission completed. */
   enterPickupCode: (requestId: string, code: string) => 'completed' | 'invalid';
   /** Sitter types the drop-off code at hand-over → mission starts; the First Night Update appears only then. */
   enterDropoffCode: (requestId: string, code: string) => 'started' | 'invalid' | 'locked_out';
   resetAll: () => void;
 };
+
+/** Chat clock (real time, shifted by the dev-only demo offset). */
+const chatNow = (chat: MissionChat) => new Date(Date.now() + (chat.demoOffsetHours ?? 0) * 3600_000).toISOString();
 
 const initial: State = { pets: [], photos: [], requests: [], chats: {} };
 
@@ -231,6 +239,24 @@ export const useAppStore = create<State & Actions>()(
         return { ok: true };
       },
 
+      advanceDemoClock: (requestId, hours) =>
+        set((s) => {
+          const chat = s.chats[requestId];
+          if (!chat) return s;
+          return { chats: { ...s.chats, [requestId]: { ...chat, demoOffsetHours: (chat.demoOffsetHours ?? 0) + hours } } };
+        }),
+
+      submitReview: (requestId, role, criteria, comment) => {
+        const chat = get().chats[requestId];
+        if (!chat || chat.status !== 'completed') return { ok: false, error: 'La mission n’est pas terminée.' };
+        if (chat.reviews?.[role]) return { ok: false, error: 'Vous avez déjà donné votre avis.' };
+        const rating = reviewRating(criteria, role);
+        if (rating == null) return { ok: false, error: 'Notez chaque critère.' };
+        const review: LocalReview = { criteria, rating, comment: comment?.trim() || undefined, createdAt: chatNow(chat) };
+        set((s) => ({ chats: { ...s.chats, [requestId]: { ...chat, reviews: { ...chat.reviews, [role]: review } } } }));
+        return { ok: true };
+      },
+
       enterDropoffCode: (requestId, code) => {
         const chat = get().chats[requestId];
         if (!chat || chat.status !== 'confirmed') return 'invalid';
@@ -239,7 +265,7 @@ export const useAppStore = create<State & Actions>()(
           set((s) => ({ chats: { ...s.chats, [requestId]: { ...chat, dropoffAttempts: chat.dropoffAttempts + 1 } } }));
           return chat.dropoffAttempts + 1 >= 5 ? 'locked_out' : 'invalid';
         }
-        const now = new Date().toISOString();
+        const now = chatNow(chat);
         const pets = get().pets.filter((p) => get().requests.find((r) => r.id === requestId)?.petIds.includes(p.id));
         const petName = pets.map((p) => p.name).join(' & ') || 'L’animal';
         set((s) => ({
@@ -271,7 +297,7 @@ export const useAppStore = create<State & Actions>()(
         const finalReason: PickupReason = lastDay ? 'completed' : (reason ?? 'completed');
         if (!lastDay && finalReason === 'completed') return { ok: false, error: 'Indiquez pourquoi la mission se termine plus tôt.' };
         const code = String(Math.floor(Math.random() * 1_000_000)).padStart(6, '0');
-        const now = new Date().toISOString();
+        const now = chatNow(chat);
         set((s) => ({
           chats: {
             ...s.chats,
@@ -294,7 +320,7 @@ export const useAppStore = create<State & Actions>()(
         const chat = get().chats[requestId];
         if (!chat || chat.status !== 'in_progress' || !chat.pickupCode) return 'invalid';
         if (code.replace(/\s/g, '') !== chat.pickupCode) return 'invalid';
-        const now = new Date().toISOString();
+        const now = chatNow(chat);
         set((s) => ({
           chats: {
             ...s.chats,
@@ -317,7 +343,7 @@ export const useAppStore = create<State & Actions>()(
         set((s) => {
           const chat = s.chats[requestId];
           if (!chat) return s;
-          const msg: ChatMessage = { id: newId('msg'), from, kind: 'text', body: text, createdAt: new Date().toISOString() };
+          const msg: ChatMessage = { id: newId('msg'), from, kind: 'text', body: text, createdAt: chatNow(chat) };
           return { chats: { ...s.chats, [requestId]: { ...chat, messages: [...chat.messages, msg] } } };
         });
       },
@@ -326,7 +352,7 @@ export const useAppStore = create<State & Actions>()(
         set((s) => {
           const chat = s.chats[requestId];
           if (!chat) return s;
-          const msg: ChatMessage = { id: newId('msg'), from, kind: 'file', file, createdAt: new Date().toISOString() };
+          const msg: ChatMessage = { id: newId('msg'), from, kind: 'file', file, createdAt: chatNow(chat) };
           return { chats: { ...s.chats, [requestId]: { ...chat, messages: [...chat.messages, msg] } } };
         }),
 
@@ -336,7 +362,7 @@ export const useAppStore = create<State & Actions>()(
         if (chat.status !== 'in_progress') return { ok: false, error: 'Le First Night Update arrive après la remise de l’animal.' };
         if (chat.firstNight.status === 'answered') return { ok: false, error: 'Le First Night Update a déjà été envoyé.' };
         if (!answer.night || !answer.morning) return { ok: false, error: 'Répondez aux deux questions.' };
-        const now = new Date().toISOString();
+        const now = chatNow(chat);
         set((s) => ({
           chats: {
             ...s.chats,

@@ -8,6 +8,8 @@ export const PICKUP_REASON_LABELS: Record<PickupReason, string> = {
   early_sitter: 'Le Pet Sitter interrompt la garde',
 };
 
+export type LocalReview = { criteria: Record<string, number>; rating: number; comment?: string; createdAt: string };
+
 export type ChatFile = { name: string; mime: string; uri: string; size?: number; width?: number; height?: number };
 
 export type ChatMessage = {
@@ -42,6 +44,9 @@ export type MissionChat = {
   pickupCode?: string;
   pickupReason?: PickupReason;
   endedAt?: string;
+  /** Dev-only demo clock offset (hours) to show 48 h photo reminders without waiting. */
+  demoOffsetHours?: number;
+  reviews?: Partial<Record<ChatParty, LocalReview>>;
   confirmedAt: string;
   messages: ChatMessage[];
   firstNight: FirstNightUpdate;
