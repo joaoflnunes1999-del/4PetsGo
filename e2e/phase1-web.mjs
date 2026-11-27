@@ -39,6 +39,12 @@ try {
   await step('welcome screen', async () => {
     await page.getByText('Your Pet, their care, one place!').waitFor();
     await shot('welcome');
+    await id('welcome-sign-in').click();
+    await id('signin-email').fill('julie@exemple.fr');
+    await id('signin-send').click();
+    await id('signin-error').waitFor(); // no Supabase project yet in local dev: clear message, no dead end
+    await shot('sign-in');
+    await page.goBack();
     await id('welcome-start').click();
   });
   await step('owner onboarding', async () => {

@@ -5,7 +5,6 @@ import { Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Button, Text } from '@/components/ui';
-import { FEATURES } from '@/config/features';
 import { colors, fontFamily, layout, spacing } from '@/theme';
 
 const DOG_RATIO = 469 / 640;
@@ -45,12 +44,10 @@ export default function Welcome() {
         <View style={[styles.arcWrap, { paddingBottom: Math.max(insets.bottom, spacing.lg) }]}>
           <View style={[styles.arc, { width: arc, height: arc, borderRadius: arc / 2, left: (width - arc) / 2 }]} />
           <View style={styles.actions}>
-            <Button label="Commencer" onPress={() => router.push('/onboarding/role')} testID="welcome-start" />
-            {FEATURES.accountSignIn ? (
-              <Pressable accessibilityRole="button" style={styles.signIn} testID="welcome-sign-in">
-                <Text variant="bodyStrong">Se connecter</Text>
-              </Pressable>
-            ) : null}
+            <Button label="Se connecter" onPress={() => router.push('/auth/sign-in')} testID="welcome-sign-in" />
+            <Pressable accessibilityRole="button" onPress={() => router.push('/onboarding/role')} style={styles.signIn} testID="welcome-start">
+              <Text variant="bodyStrong">Créer un compte</Text>
+            </Pressable>
           </View>
         </View>
       </View>
