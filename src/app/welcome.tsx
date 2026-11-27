@@ -9,13 +9,15 @@ import { FEATURES } from '@/config/features';
 import { colors, fontFamily, layout, spacing } from '@/theme';
 
 const DOG_RATIO = 469 / 640;
-const LOGO_RATIO = 634 / 800;
+const LOGO_RATIO = 711 / 800;
 
 /** Entry screen, reproduced from the founder's reference mock-up (27/11/2026). */
 export default function Welcome() {
   const insets = useSafeAreaInsets();
-  const { width } = useWindowDimensions();
+  const { width, height } = useWindowDimensions();
   const w = Math.min(width, layout.maxContentWidth + 40);
+  // On short screens the logo shrinks so the accent strokes never touch the top edge.
+  const logoWidth = Math.min(w * 0.8, (height - insets.top) * 0.36);
   const dogWidth = w * 0.72;
   const arc = w * 1.9;
 
@@ -25,7 +27,7 @@ export default function Welcome() {
       <View style={[styles.top, { paddingTop: insets.top + spacing.xxl }]}>
         <Image
           source={require('@/assets/images/logo-welcome.png')}
-          style={{ width: w * 0.8, height: w * 0.8 * LOGO_RATIO }}
+          style={{ width: logoWidth, height: logoWidth * LOGO_RATIO }}
           contentFit="contain"
           accessibilityRole="header"
           accessibilityLabel="4PetsGo"
