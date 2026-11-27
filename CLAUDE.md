@@ -36,7 +36,7 @@ EXPO_OFFLINE=1 npx expo install <pkg>   # ajouter une dépendance compatible ave
 
 - Expo SDK 58, React Native 0.88, React 19.3, Expo Router (routes typées), TypeScript strict, React Compiler activé.
 - État local : **Zustand** + `persist` (AsyncStorage). Ce stockage sera remplacé par Supabase en phase 2.
-- Police : Inter uniquement (hiérarchie par la graisse et la taille), via `@expo-google-fonts/inter`.
+- Polices : Poppins (titres) et Inter (texte), via `@expo-google-fonts/poppins` et `@expo-google-fonts/inter`.
 - Icônes : `@expo/vector-icons` (Feather et MaterialCommunityIcons).
 - Images : `expo-image` pour l'affichage, `expo-image-picker` pour la caméra et la photothèque.
 - Tests : Jest (`jest-expo`) pour la logique pure, dans `src/features/**/__tests__`. Le parcours E2E Playwright sur Expo Web est dans `e2e/phase1-web.mjs` (onboarding → animal → galerie → recherche → négociation → verrouillage → Pet Sitter).
@@ -70,23 +70,23 @@ docs/                      # PRD, roadmap
 ## Décisions techniques
 
 - **Design system** : toute couleur, taille, espacement ou rayon vient de `@/theme`. Pas de valeur en dur dans les écrans.
-- **Identité visuelle** (validée le 24/11/2026, remplace les versions précédentes) : moderne, minimaliste, premium, chaleureuse, naturelle et élégante, avec la simplicité de Vinted et d'Uber. **Le terracotta domine.** Le bleu et le sauge s'utilisent avec modération.
+- **Identité visuelle v4** (27/11/2026, inspirée de la maquete de référence du fondateur, remplace les versions précédentes) :
 
-  | Couleur | Rôle | Token |
+  | Rôle | Couleur | Token |
   |---|---|---|
-  | Burnt Terracotta `#B9674E` | marque, boutons d'action, accents | `colors.action`, `colors.brand` |
-  | Clay Brown `#854B3A` | contrastes, profondeur | `colors.secondary` |
-  | Warm Ivory `#F7F2EA` | fond principal | `colors.background` |
-  | Soft Sand `#E9D8C9` | fonds secondaires, zones de contenu | `colors.surfaceMuted` |
-  | Dusty Blue `#718B9C` | filtres, sélection, certaines icônes, infos secondaires | `colors.selected*`, `colors.info` |
-  | Sage Green `#A8B09A` | éléments positifs, détails naturels | `colors.success*` |
-  | Charcoal `#35312E` | textes et titres | `colors.text` |
-  | Muted Gold `#D5AD79` | récompenses, Paw Points, petits détails | `colors.accent*` |
+  | **Actions uniquement** : boutons principaux, onglet actif, filtre actif | Terracotta `#B9674E` | `colors.action`, `colors.selected` |
+  | Couleur naturelle de la marque : icônes, liens, coche « vérifié », bouton d'envoi du chat, états positifs | Vert forêt `#3F6A4F` | `colors.primary`, `colors.success`, `colors.sendButton` |
+  | Grandes surfaces calmes : accueil, bandeau du profil Pet Sitter, mes bulles de chat, « Confirmée » | Vert sauge clair `#DFE9D8` | `colors.brandSurface`, `colors.bubbleOwn`, `colors.successSoft` |
+  | Fond de l'app | Crème `#F6F1EA` | `colors.background` |
+  | Cartes (sans contour, ombre chaude légère `shadow.card`) | Blanc crème `#FFFDFA` | `colors.surface` |
+  | Étiquettes, zones secondaires | Sable `#F1E9DF` | `colors.surfaceMuted` |
+  | Récompenses, Paw Points, étoiles, Owner Club | Or doux `#D5AD79` / `#FBEFD6` | `colors.accent*` |
+  | Textes et titres | Charbon `#2F2B28` | `colors.text` |
 
-  - **Cartes blanches** (`colors.surface`) sur fond ivoire.
-  - Toutes les variantes (échelles 50 à 700) sont dans `palette`, dans `src/theme/tokens.ts`. Les écrans n'utilisent que les tokens sémantiques `colors.*`. Aucune couleur en dur hors de `src/theme`.
-  - **Contraste** : un texte blanc sur terracotta 500 donne 4,1:1, donc les libellés de boutons sont en Bold 16 (variante `button`). Le texte et les petites icônes de couleur utilisent toujours la teinte 700 de leur famille (≥ 4,6:1).
-  - Typographie : Inter uniquement, en Regular, Medium, SemiBold et Bold (`fontFamily`, `typography`). Coins légèrement arrondis (10 px), espacements généreux (20 px), icônes simples (Feather).
+  - **Typographie** : **Poppins** (SemiBold, Bold), géométrique et arrondie, pour les titres, les noms, les montants et les libellés de boutons, avec une interlignage serré (`displayXL` 44, `displayL` 28, `displayM` 22, `title` 16). **Inter** pour le texte courant.
+  - **Formes** : boutons et filtres en **pilule** (`radius.pill`), cartes arrondies à 20 px (`radius.lg`), étiquettes en petites pilules sable, icônes Feather au trait fin. Barre d'onglets blanche, onglet actif en terracotta.
+  - Toutes les variantes sont dans `palette` (`src/theme/tokens.ts`). Les écrans n'utilisent que `colors.*`, et aucune couleur n'est écrite en dur ailleurs.
+  - **Contraste** : blanc sur terracotta 4,1:1, uniquement pour des libellés gras de 16 px ou plus. Blanc sur vert forêt 6,2:1. Vert forêt sur crème 5,5:1.
   - **Badges de niveau et de confiance** : écrits avec une majuscule initiale (« Expert », « Identité vérifiée »), jamais en capitales, **en gras**, en charbon (variante `badge`). Les étoiles d'avis sont **pleines**, en Muted Gold (`colors.accent`).
   - **Niveaux** : chaque niveau a son emblème, une patte numérotée de 1 à 5 (`assets/images/levels/*.png`, composant `LevelIcon`, au moins 24 px pour que le chiffre reste lisible). **Unité Paw Points** : la pièce `assets/images/paw-coin.png` (composant `PawCoin`). On n'utilise plus d'icône de patte générique pour les Paw Points.
   - **Commission** : elle n'apparaît pas sur le profil du Pet Sitter. Elle n'est expliquée que dans la feuille d'information des niveaux (bouton « i » sous les 5 pattes, `LevelsInfoSheet`), avec des valeurs lues dans `pricing/config.ts`.
